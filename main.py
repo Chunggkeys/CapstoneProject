@@ -4,13 +4,19 @@ from sysInit import *
 # import hardware functions
 # import db
 
+doTest = True
+
 # while 1:
 motor = mechSysInit()
 gui = guiInit()
 db = dbInit()
 hw = hwInit()
 
-# At this point, gui will have user input already
 manager = Manager(gui, hw, db, motor)
 manager.waitUserInput()
+
+while doTest:
+
+# At this point, gui will have user input already
+
 manager.beginTest()
