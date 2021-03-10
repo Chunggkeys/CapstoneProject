@@ -28,8 +28,8 @@ class SampleHW:
 ##
 
 
-def mechSysInit():
-    motor = SMC100(123, "/dev/serial0", silent=False)
+def mechSysInit(port):
+    motor = SMC100(123, port, silent=False)
     # motor.home()
     return motor
 
