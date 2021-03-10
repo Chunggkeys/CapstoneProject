@@ -5,43 +5,59 @@ from sysInit import *
 # import db
 
 PORT = "/dev/serial0"
-MACHINE_STATES = {
-    "IDLE" : 0,
-    "EXECUTING" : {
-        "HOMING" : 1,
-        "CALIBRATING" : 2,
-        "MOVING_DOWN" : 3,
-        "MOVING_UP" : 4
-    },
-    "FAULTED" : 5,
-    "FAILED": -1
-}
+
+IDLE_STATE = 0
+HOMING_STATE = 1
+CALIBRATING_STATE = 2
+MOVING_DOWN_STATE = 3
+MOVING_UP_STATE = 4 
+FAULTED_STATE = 5
+FAILED_STATE = -1
 
 # while 1:
-motor = mechSysInit(PORT)
+motor = mechSysInit(PORT, devMode=True)
 gui = guiInit()
 db = dbInit()
 hw = hwInit()
 
-startState = MACHINE_STATE["IDLE"]
-# manager = Manager(gui, hw, db, motor)
-# manager.waitUserInput()
+curState = IDLE_STATE
+startPressed = False
 
-#Placeholder code
-    print("Waiting for user input...")
-    sleep(5)
+while 1:
+    while 1:
+        inputData = gui.checkDataBuffer()
+        if inputData is not None:
+            break
     #
 
-    ## Following code will be completed during integration
-    # while 1:
-    #     inputData = gui.checkDataBuffer()
-    #     if inputData is not None:
-    #         break
-    ##
+    while not startPressed:
+        startPressed = gui.waitStart()
+        curState = HOMING_STATE
 
-# At this point, gui will have user input already
-while 
-    # manager.beginTest()
+    # At this point, gui will have user input already
+    # This loop controls motor 
+    while curState >= HOMING_STATE and curState <= MOVING_UP_STATE:
+        if curState == HOMING_STATE:
+            motor.home()
+            curState += 1
+        elif curState == CALIBRATING_STATE:
+            # Calibrate motor here
+            curState += 1
+        elif curState == MOVING_DOWN_STATE:
+            # Motor displaces downward
+            curState += 1
+        elif curState == MOVING_UP_STATE:
+            # Motor displaces upward
+            curState -= 1
+        elif curState == FAULTED_STATE:
+            # Retry most recent action?
+            pass
+        elif curState == FAILED_STATE:
+            
+            gui.displayError(code, msg)
+            curState = IDLE_STATE
+
+    
 
 
 

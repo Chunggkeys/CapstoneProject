@@ -25,11 +25,23 @@ class SampleHW:
 
     def msg(self):
         return self.msg
+
+class SampleMotor:
+    def __init__(self):
+        self.msg = "this is a sample motor"
+        print("Initializing motor...")
+
+    def msg(self):
+        return self.msg
 ##
 
 
-def mechSysInit(port):
-    motor = SMC100(123, port, silent=False)
+def mechSysInit(port, devMode=False):
+    if not devMode:
+        motor = SMC100(123, port, silent=False)
+        motor.home()
+    else:
+        motor = SampleMotor()
     # motor.home()
     return motor
 
@@ -46,3 +58,5 @@ def dbInit():
 def hwInit():
     hw = SampleHW()
     return hw
+
+def
