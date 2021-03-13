@@ -12,11 +12,13 @@ CALIBRATING_STATE = 2
 MOVING_DOWN_STATE = 3
 MOVING_UP_STATE = 4 
 FAULTED_STATE = 5
+TEST_COMPLETE_STATE = 6
 FAILED_STATE = -1
-
+curCycle = 1
+totalCycles = 0; displacement = 0
 # while 1:
-motor = mechSysInit(PORT, devMode=True)
-gui = guiInit()
+motor = mechSysInit(PORT, True)
+guiOutput, guiControl = guiInit()
 db = dbInit()
 hw = hwInit()
 
@@ -25,39 +27,59 @@ startPressed = False
 
 while 1:
     while 1:
-        inputData = gui.checkDataBuffer()
+        inputData = guiControl.getDataBuffer()
         if inputData is not None:
+            totalCycles = inputData['nCycles']
+            displacement = inputData['length']
             break
     #
 
+    # Tentatively here, might be removed
     while not startPressed:
-        startPressed = gui.waitStart()
+        startPressed = guiControl.waitStart()
         curState = HOMING_STATE
+    # 
 
     # At this point, gui will have user input already
     # This loop controls motor 
     while curState >= HOMING_STATE and curState <= MOVING_UP_STATE:
         if curState == HOMING_STATE:
             motor.home()
+            print(curState)
             curState += 1
         elif curState == CALIBRATING_STATE:
             # Calibrate motor here
+            print(curState)
             curState += 1
         elif curState == MOVING_DOWN_STATE:
             # Motor displaces downward
-            curState += 1
+
+            # Need to include error handling
+            if curCycle <= totalCycles:
+                motor.move_relative_mm(displacement)
+                curState += 1; curCycle += 1
+            else:
+                curState = TEST_COMPLETE_STATE
         elif curState == MOVING_UP_STATE:
             # Motor displaces upward
+            motor.move_relative_mm(-displacement)
+            print(curState)
             curState -= 1
         elif curState == FAULTED_STATE:
             # Retry most recent action?
-            pass
+            print(curState)
+        elif curState == TEST_COMPLETE_STATE: 
+            print("Test completed")
+            motor.home()
+            break
         elif curState == FAILED_STATE:
-            
-            gui.displayError(code, msg)
+            print(curState)    
+            guiOutput.displayError(code, msg)
             curState = IDLE_STATE
 
-    
+    db.sendData(0)
+    startPressed = False; inputData = None
+    curState = IDLE_STATE; curCycle = 1
 
 
 

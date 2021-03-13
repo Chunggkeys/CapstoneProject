@@ -1,14 +1,53 @@
-from pySMC100.smc100 import * 
-from ioInterface import *
+# from pySMC100.smc100 import * 
+# from ioInterface import *
+import time
 
 ## Placeholder classes 
-class SampleGUI:
+class SampleGUIControl:
     def __init__(self):
-        self.msg = "this is a sample gui"
-        print("Initializing user interface..")
+        self.msg = "this is a sample gui control"
+        print("Initializing gui control")
     
     def msg(self):
         return self.msg
+
+    def waitStart(self):
+        time.sleep(1)
+        print("start button pressed")
+        return True
+    
+    def getDataBuffer(self):
+        time.sleep(1)
+        print("Grabbed data from display")
+        data = { 
+            'length' : 10,
+            'thick' : 2,
+            'defn' : 3,
+            'ptt1' : 25,
+            'ptt2' : 30,
+            'ptt3' : 35,
+            'ptt4' : 40,
+            'nCycles' : 5 
+        }
+        return data
+        
+
+
+class SampleGUIOutput:
+    def __init__(self):
+        self.msg = "this is a sample gui output"
+        print("Initializing gui output...")
+
+        def msg(self):
+            return self.msg
+        
+        def sendData(self, data):
+            print("sending data to output")
+            return
+        
+        def displayError(self, errorCode, msg):
+            print("Error sent to display")
+
 
 class SampleDB:
     def __init__(self):
@@ -17,6 +56,11 @@ class SampleDB:
     
     def msg(self):
         return self.msg
+
+    def sendData(self, data):
+        self.data = data
+        print("data sent")
+        return
 
 class SampleHW:
     def __init__(self):
@@ -33,6 +77,14 @@ class SampleMotor:
 
     def msg(self):
         return self.msg
+
+    def home(self):
+        print("Homing motor")
+        return 0
+    
+    def move_relative_mm(self, dist_mm, waitStop=True):
+        time.sleep(1)
+        print("Moving stage downwards to ", dist_mm)
 ##
 
 
@@ -47,9 +99,9 @@ def mechSysInit(port, devMode=False):
 
 def guiInit():
     # Display should startup here
-    
-    gui = SampleGUI()
-    return gui
+    guiOutput = SampleGUIOutput()
+    guiControl = SampleGUIControl()
+    return guiOutput, guiControl
 
 def dbInit():
     db = SampleDB()
@@ -58,5 +110,3 @@ def dbInit():
 def hwInit():
     hw = SampleHW()
     return hw
-
-def
