@@ -5,7 +5,7 @@ import time
 from math import floor
 
 # never wait for more than this e.g. during wait_states
-MAX_WAIT_TIME_SEC = 12
+MAX_WAIT_TIME_SEC = 30
 
 # time to wait after sending a command. This number has been arrived at by
 # trial and error
@@ -107,8 +107,6 @@ class SMC100(object):
 
     self._last_sendcmd_time = 0
 
-    print 'Connecting to SMC100 on %s'%(port)
-
     self._port = serial.Serial(
         port = port,
         baudrate = 57600,
@@ -117,6 +115,8 @@ class SMC100(object):
         parity = 'N',
         xonxoff = True,
         timeout = 0.050)
+
+    print("Connected to SMC100 on",(port))
 
     self._smcID = str(smcID)
 
@@ -134,7 +134,7 @@ class SMC100(object):
     self.wait_states(STATE_NOT_REFERENCED_FROM_RESET, ignore_disabled_states=True)
 
     stage = self.sendcmd('ID', '?', True)
-    print 'Found stage', stage
+    print('Found stage', stage)
 
     # enter config mode
     self.sendcmd('PW', 1)
@@ -162,7 +162,6 @@ class SMC100(object):
     effect, and homing is generally expected to place the stage at the
     origin, an absolute move to 0 um is executed after homing. This ensures
     that the stage is at origin after calling this method.
-
     Calling this method is necessary to take the controller out of not referenced
     state after a restart.
     """
@@ -193,7 +192,7 @@ class SMC100(object):
     return errors, state
 
   def get_position_mm(self):
-    dist_mm = float(self.sendcmd('TP', '?', expect_response=True, retry=10))
+    dist_mm = float(self.sendcmd('TP', '?', expect_response=True, retry=20))
     return dist_mm
 
   def get_position_um(self):
@@ -218,7 +217,6 @@ class SMC100(object):
     """
     Moves the stage relatively to the current position by the given distance given in um. The
     given distance is first converted to an integer.
-
     If waitStop is True then this method returns when the move is completed.
     """
     dist_mm = int(dist_um)/1000
@@ -338,8 +336,10 @@ class SMC100(object):
 
       self._port.flushOutput()
 
-      self._port.write(tosend)
-      self._port.write('\r\n')
+      self._port.write(tosend.encode())
+
+      endol='\r\n'
+      self._port.write(endol.encode())
 
       self._port.flush()
 
@@ -353,7 +353,7 @@ class SMC100(object):
             return response[len(prefix):]
           else:
             raise SMC100InvalidResponseException(command, response)
-        except Exception, ex:
+        except Exception as ex:
           if not retry or retry <=0:
             raise ex
           else:
@@ -367,7 +367,6 @@ class SMC100(object):
         dt = COMMAND_WAIT_TIME_SEC - dt
         if dt > 0:
           self._sleepfunc(dt)
-        
         self._last_sendcmd_time = now
         return None
 
@@ -396,6 +395,7 @@ class SMC100(object):
     #print 'reading line',
     while not done:
       c = self._port.read()
+      c = c.decode()
       # ignore \r since it is part of the line terminator
       if len(c) == 0:
         raise SMC100ReadTimeOutException()
@@ -421,7 +421,7 @@ class SMC100(object):
       message = args[1]
 
     if not self._silent:
-      print '[SMC100' + prefix + '] ' + message
+      print('[SMC100' + prefix + '] ' + message)
 
   def close(self):
     if self._port:
@@ -430,6 +430,7 @@ class SMC100(object):
 
   def __del__(self):
     self.close()
+    
 # Tests #####################################################################
 def test_configure():
   smc100 = SMC100(1, '/dev/ttyS5', silent=False)
@@ -440,7 +441,7 @@ def test_configure():
 
 def test_general():
   smc100 = SMC100(1, '/dev/ttyS5', silent=False)
-  print smc100.get_position_mm()
+  print(smc100.get_position_mm())
 
   smc100.home()
 
