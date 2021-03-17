@@ -5,6 +5,29 @@ import sys
 import numpy as np
 
 from control import ControlModule
+from output import OutputModule
+
+paramMappings = {
+    'l': 'Length',
+    't': 'Thickness',
+    'd': 'Deformation',
+    'n': 'Number of Cycles',
+    'p1': 'Potentiometer 1',
+    'p2': 'Potentiometer 2',
+    'p3': 'Potentiometer 3',
+    'p4': 'Potentiometer 4'
+}
+
+maxParamMappings = {
+    'l': str(ControlModule.MAX_LENGTH) + ' mm',
+    't': str(ControlModule.MAX_THICK) + ' mm',
+    'd': str(ControlModule.MAX_DEF) + ' mm',
+    'n': str(ControlModule.MAX_CYCLES),
+    'p1': str(ControlModule.MAX_POT) + ' \u03A9',
+    'p2': str(ControlModule.MAX_POT) + ' \u03A9',
+    'p3': str(ControlModule.MAX_POT) + ' \u03A9',
+    'p4': str(ControlModule.MAX_POT) + ' \u03A9'
+}
 
 class MainWindow(QtWidgets.QMainWindow):
     
@@ -44,84 +67,75 @@ class MainWindow(QtWidgets.QMainWindow):
         self.curveDef = self.graph_def.plot()
         self.curveResist = self.graph_resist.plot()
 
-        self.initializeData()
-
-        self.ptr = 1
+        #Initialize timer
         self.timer = pg.QtCore.QTimer()
         self.timer.timeout.connect(self.update)
-
-    def initializeData(self):
-        self.x = np.empty(200)
-        for i in range(200):
-            self.x[i] = i/20
-        self.dataDef = np.empty(200)
-        self.dataResist = np.empty(200)
-
-        self.dataDef[0] = 0
-        self.dataResist[0] = 0
     
     def update(self):
-        #Random data generation for testing
-        deformation = ControlModule.getDataBuffer()['defn']
-        if self.ptr < 200:
-            self.dataDef[self.ptr] = self.dataDef[self.ptr-1] + deformation*np.random.rand()/10
-            self.dataResist[self.ptr] = self.dataResist[self.ptr-1] + np.random.rand()/10
-
-            if self.dataDef[self.ptr] > deformation:
-                self.dataDef[self.ptr] = 0
-            if self.dataResist[self.ptr] > 1.0:
-                self.dataResist[self.ptr] = 0
-            
-            self.ptr += 1
-
-            self.curveDef.setData(self.x[:self.ptr], self.dataDef[:self.ptr])
-            self.curveResist.setData(self.x[:self.ptr], self.dataResist[:self.ptr])
-        else :
-            self.dataDef[:-1] = self.dataDef[1:]
-            self.dataDef[-1] = self.dataDef[-2] + deformation*np.random.rand()/10
-
-            self.dataResist[:-1] = self.dataResist[1:]
-            self.dataResist[-1] = self.dataResist[-2] + np.random.rand()/10
-
-            if self.dataDef[-1] > deformation:
-                self.dataDef[-1] = 0
-            if self.dataResist[-1] > 1.0:
-                self.dataResist[-1] = 0
-
-            self.ptr += 1
-
-            self.x[:-1] = self.x[1:]
-            self.x[-1] = self.ptr/20
-
-            self.curveDef.setData(self.x, self.dataDef)
-            self.curveResist.setData(self.x, self.dataResist)
-            # self.curveDef.setPos(self.ptr/20, 0)
-            # self.curveResist.setPos(self.ptr/20, 0)
+        error = OutputModule.getError()
+        if error:
+            self.timer.stop()
+            self.displayMessage(error)
+        else:
+            [ptr, x, dataDef, dataResist] = OutputModule.getData()
+            if (ptr < OutputModule.DATA_BUFF_SIZE):
+                self.curveDef.setData(x[:ptr], dataDef[:ptr])
+                self.curveResist.setData(x[:ptr], dataDef[:ptr])
+            else:
+                self.curveDef.setData(x, dataDef)
+                self.curveResist.setData(x, dataResist)
 
     def submit(self):
-        l = float(self.input_length.text())
-        t = float(self.input_thick.text())
-        d = float(self.input_def.text())
-        n = int(self.input_nCycles.text())
-        p1 = float(self.input_ptt1.text())
-        p2 = float(self.input_ptt2.text())
-        p3 = float(self.input_ptt3.text())
-        p4 = float(self.input_ptt4.text())
+        params = self.parseInputs()
 
-        invalid = ControlModule.validateParams(l,t,d,n,p1,p2,p3,p4)
-        if not invalid:
-            ControlModule.setDataBuffer(l,t,d,n,p1,p2,p3,p4)
-            self.graph_def.setYRange(0, d, padding=0.1)
-            self.btn_start.setEnabled(True)
-        else: 
-            print(invalid)
-            self.btn_start.setEnabled(False)
+        if params:
+            invalid = ControlModule.validateParams(params)
+
+            if not invalid:
+                ControlModule.setDataBuffer(params)
+                self.graph_def.setYRange(0, params['d'], padding=0.1)
+                self.btn_start.setEnabled(True)
+            else: 
+                errorMessage = ''
+                for p in invalid:
+                    errorMessage = errorMessage + paramMappings[p] + ' must be positive and less than ' + maxParamMappings[p] + '\n'
+                self.displayMessage(errorMessage)
+                self.btn_start.setEnabled(False)
+        
+    def parseInputs(self):
+        l = self.input_length.text()
+        t = self.input_thick.text()
+        d = self.input_def.text()
+        n = self.input_nCycles.text()
+        p1 = self.input_ptt1.text()
+        p2 = self.input_ptt2.text()
+        p3 = self.input_ptt3.text()
+        p4 = self.input_ptt4.text()
+
+        if (not l or not t or not d or not n or not
+            p1 or not p2 or not p3 or not p4):
+            self.displayMessage('Cannot leave field empty')
+            return {}
+        else:
+            return {
+                'l': float(l), 
+                't': float(t), 
+                'd': float(d), 
+                'n': int(n), 
+                'p1': float(p1), 
+                'p2': float(p2), 
+                'p3': float(p3), 
+                'p4': float(p4)
+            }
+
 
     def toggleStart(self):
         if not self.btn_start.isChecked():
+            ControlModule.setRunning(False)
             self.timer.stop()
             self.btn_start.setText('Begin Cycles')
         else:
+            ControlModule.setRunning(True)
             self.timer.start(50)
             self.btn_start.setText('Stop')
             self.input_length.setReadOnly(True)
@@ -132,6 +146,12 @@ class MainWindow(QtWidgets.QMainWindow):
             self.input_ptt2.setReadOnly(True)
             self.input_ptt3.setReadOnly(True)
             self.input_ptt4.setReadOnly(True)
+
+    def displayMessage(self, message):
+        msg = QtWidgets.QMessageBox()
+        msg.setIcon(QtWidgets.QMessageBox.Information)
+        msg.setText(message)
+        msg.exec()
 
 def main():
     app = QtWidgets.QApplication(sys.argv)

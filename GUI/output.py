@@ -1,14 +1,15 @@
-#WORK IN PROGRESS
-#DOESNT DO ANYTHING RN
-
 import numpy as np
 
 class Output():
+    DATA_BUFF_SIZE = 200
+
     def __init__(self):
         self.x = []
         self.dataDef = []
         self.dataResist = []
         self.ptr = 1
+
+        self.error = ''
 
         self.initializeData()
     
@@ -26,7 +27,32 @@ class Output():
         self.ptr = 1
         self.initializeData()
     
-    def update(self, x, dataDef, dataResist):
-        self.x = x
-        self.dataDef = dataDef
-        self.dataResist = dataResist
+    def update(self, x, deformation, resist):
+        if self.ptr < 200:
+            self.dataDef[self.ptr] = deformation
+            self.dataResist[self.ptr] = resist
+            self.x[self.ptr] = x
+
+            self.ptr +=1 
+        else:
+            self.dataDef[:-1] = self.dataDef[1:]
+            self.dataDef[-1] = deformation
+
+            self.dataResist[:-1] = self.dataResist[1:]
+            self.dataResist[-1] = resist
+
+            self.ptr +=  1
+
+            self.x[:-1] = self.x[1:]
+            self.x[-1] = x
+    
+    def getData(self):
+        return [self.ptr, self.x, self.dataDef, self.dataResist]
+    
+    def setError(self, error):
+        self.error = error
+    
+    def getError(self):
+        return self.error
+
+OutputModule = Output()
