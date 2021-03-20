@@ -2,10 +2,7 @@ from PyQt5 import QtWidgets, uic, QtGui
 from pyqtgraph import PlotWidget
 import pyqtgraph as pg
 import sys
-import numpy as np
-
-from control import ControlModule
-from output import OutputModule
+from constants import *
 
 paramMappings = {
     'l': 'Length',
@@ -19,23 +16,27 @@ paramMappings = {
 }
 
 maxParamMappings = {
-    'l': str(ControlModule.MAX_LENGTH) + ' mm',
-    't': str(ControlModule.MAX_THICK) + ' mm',
-    'd': str(ControlModule.MAX_DEF) + ' mm',
-    'n': str(ControlModule.MAX_CYCLES),
-    'p1': str(ControlModule.MAX_POT) + ' \u03A9',
-    'p2': str(ControlModule.MAX_POT) + ' \u03A9',
-    'p3': str(ControlModule.MAX_POT) + ' \u03A9',
-    'p4': str(ControlModule.MAX_POT) + ' \u03A9'
+    'l': str(MAX_LENGTH) + ' mm',
+    't': str(MAX_THICK) + ' mm',
+    'd': str(MAX_DEF) + ' mm',
+    'n': str(MAX_CYCLES),
+    'p1': str(MAX_POT) + ' \u03A9',
+    'p2': str(MAX_POT) + ' \u03A9',
+    'p3': str(MAX_POT) + ' \u03A9',
+    'p4': str(MAX_POT) + ' \u03A9'
 }
 
 class MainWindow(QtWidgets.QMainWindow):
     
-    def __init__(self, *args, **kwargs):
+    def __init__(self, control, output, *args, **kwargs):
         super(MainWindow, self).__init__(*args, **kwargs)
 
         #Load the UI Page
         uic.loadUi('mainwindow.ui', self)
+
+        #initialize modules
+        self.control = control
+        self.output = output
 
         #Initialize button behaviour
         self.btn_submit.clicked.connect(self.submit)
@@ -81,18 +82,18 @@ class MainWindow(QtWidgets.QMainWindow):
     
     def checkEvents(self):
         if not self.messageBox.isVisible():
-            message = OutputModule.readMessages()
+            message = self.output.readMessages()
             if message:
                 self.displayMessage(message, 'info')
 
     def update(self):
-        error = OutputModule.getError()
+        error = self.output.getError()
         if error:
             self.timer.stop()
             self.displayMessage(error, 'error')
         else:
-            [ptr, x, dataDef, dataResist] = OutputModule.getData()
-            if (ptr < OutputModule.DATA_BUFF_SIZE):
+            [ptr, x, dataDef, dataResist] = self.output.getData()
+            if (ptr < DATA_BUFF_SIZE):
                 self.curveDef.setData(x[:ptr], dataDef[:ptr])
                 self.curveResist.setData(x[:ptr], dataDef[:ptr])
             else:
@@ -103,10 +104,10 @@ class MainWindow(QtWidgets.QMainWindow):
         params = self.parseInputs()
 
         if params:
-            invalid = ControlModule.validateParams(params)
+            invalid = self.control.validateParams(params)
 
             if not invalid:
-                ControlModule.setDataBuffer(params)
+                self.control.setDataBuffer(params)
                 self.graph_def.setYRange(0, params['d'], padding=0.1)
                 self.btn_start.setEnabled(True)
             else: 
@@ -145,11 +146,11 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def toggleStart(self):
         if not self.btn_start.isChecked():
-            ControlModule.setRunning(False)
+            self.control.setRunning(False)
             self.timer.stop()
             self.btn_start.setText('Begin Cycles')
         else:
-            ControlModule.setRunning(True)
+            self.control.setRunning(True)
             self.timer.start(50)
             self.btn_start.setText('Stop')
             self.input_length.setReadOnly(True)
@@ -173,11 +174,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.messageBox.setWindowTitle(type)
         self.messageBox.exec()
 
-def main():
+def initGUI(control, output):
     app = QtWidgets.QApplication(sys.argv)
-    main = MainWindow()
+    main = MainWindow(control, output)
     main.show()
     sys.exit(app.exec_())
-
-# if __name__ == '__main__':         
-#     main()

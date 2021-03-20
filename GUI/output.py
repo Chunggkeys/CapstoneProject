@@ -1,8 +1,7 @@
 import numpy as np
+from constants import *
 
 class Output():
-    DATA_BUFF_SIZE = 200
-
     def __init__(self):
         self.x = []
         self.dataDef = []
@@ -15,11 +14,11 @@ class Output():
         self.initializeData()
     
     def initializeData(self):
-        self.x = np.empty(200)
-        for i in range(200):
+        self.x = np.empty(DATA_BUFF_SIZE)
+        for i in range(DATA_BUFF_SIZE):
             self.x[i] = i/20
-        self.dataDef = np.empty(200)
-        self.dataResist = np.empty(200)
+        self.dataDef = np.empty(DATA_BUFF_SIZE)
+        self.dataResist = np.empty(DATA_BUFF_SIZE)
 
         self.dataDef[0] = 0
         self.dataResist[0] = 0
@@ -29,7 +28,8 @@ class Output():
         self.initializeData()
     
     def update(self, x, deformation, resist):
-        if self.ptr < 200:
+        print(x, deformation, resist )
+        if self.ptr < DATA_BUFF_SIZE:
             self.dataDef[self.ptr] = deformation
             self.dataResist[self.ptr] = resist
             self.x[self.ptr] = x
@@ -63,5 +63,3 @@ class Output():
         if self.messageBuffer:
             return self.messageBuffer.pop(0)
         return None
-        
-OutputModule = Output()
