@@ -63,5 +63,5 @@ class Output():
         if self.messageBuffer:
             return self.messageBuffer.pop(0)
         return None
-
+        
 OutputModule = Output()
