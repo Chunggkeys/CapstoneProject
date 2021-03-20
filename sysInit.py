@@ -1,6 +1,12 @@
-# from pySMC100.smc100 import * 
-# from ioInterface import *
 import time
+
+####### Uncomment when flipping devMode to False
+# from pySMC100.smc100 import * 
+# from GUI.control import *
+# from GUI.output import *
+# import GUI.gui as gui
+# from ioInterface import *
+########
 
 ## Placeholder classes 
 class SampleGUIControl:
@@ -19,7 +25,7 @@ class SampleGUIControl:
     def getDataBuffer(self):
         time.sleep(1)
         print("Grabbed data from display")
-        data = { 
+        self.data = { 
             'length' : 10,
             'thick' : 2,
             'defn' : 3,
@@ -29,9 +35,15 @@ class SampleGUIControl:
             'ptt4' : 40,
             'nCycles' : 5 
         }
-        return data
-        
+        return self.data
+    
+    def clearDataBuffer(self):
+        self.data = None
 
+class SampleGUI:
+    def __init__(self):
+        self.msg = "This is a sample gui"
+        print("Initialiizng gui..")
 
 class SampleGUIOutput:
     def __init__(self):
@@ -46,7 +58,10 @@ class SampleGUIOutput:
             return
         
         def displayError(self, errorCode, msg):
-            print("Error sent to display")
+            print("Error sent to display with code: ",errorCode)
+
+        def displayTestComplete(self):
+            print("Test completed")
 
 
 class SampleDB:
@@ -87,26 +102,35 @@ class SampleMotor:
         print("Moving stage downwards to ", dist_mm)
 ##
 
-
 def mechSysInit(port, devMode=False):
     if not devMode:
         motor = SMC100(123, port, silent=False)
-        motor.home()
+        # motor.home()
     else:
         motor = SampleMotor()
     # motor.home()
     return motor
 
-def guiInit():
+def guiInit(devMode=False):
     # Display should startup here
-    guiOutput = SampleGUIOutput()
-    guiControl = SampleGUIControl()
+    if devMode:
+        guiOutput = SampleGUIOutput()
+        guiControl = SampleGUIControl()
+        gui = SampleGUI()
+    else:
+        guiOutput = Output()
+        guiControl = Control()
+        gui.main() #?????
+        
     return guiOutput, guiControl
 
-def dbInit():
+def dbInit(devMode=False):
     db = SampleDB()
     return db
 
-def hwInit():
-    hw = SampleHW()
+def hwInit(devMode=False):
+    if devMode:
+        hw = SampleHW()
+    else:
+        hw = IOInterface()
     return hw

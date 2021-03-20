@@ -1,5 +1,7 @@
 from manager import Manager
 from sysInit import *
+from multiprocessing import Process, Queue
+
 # import gui
 # import hardware functions
 # import db
@@ -16,11 +18,13 @@ TEST_COMPLETE_STATE = 6
 FAILED_STATE = -1
 curCycle = 1
 totalCycles = 0; displacement = 0
-# while 1:
+calibrationDisplacement = 0
+
+# measurementData = Queue()
 motor = mechSysInit(PORT, True)
-guiOutput, guiControl = guiInit()
-db = dbInit()
-hw = hwInit()
+guiOutput, guiControl = guiInit(True)
+db = dbInit(True)
+hw = hwInit(True)
 
 curState = IDLE_STATE
 startPressed = False
@@ -31,6 +35,7 @@ while 1:
         if inputData is not None:
             totalCycles = inputData['nCycles']
             displacement = inputData['length']
+            guiControl.clearDataBuffer()
             break
     #
 
@@ -49,6 +54,7 @@ while 1:
             curState += 1
         elif curState == CALIBRATING_STATE:
             # Calibrate motor here
+
             print(curState)
             curState += 1
         elif curState == MOVING_DOWN_STATE:
@@ -69,7 +75,7 @@ while 1:
             # Retry most recent action?
             print(curState)
         elif curState == TEST_COMPLETE_STATE: 
-            print("Test completed")
+            guiOutput.displayTestComplete()
             motor.home()
             break
         elif curState == FAILED_STATE:
