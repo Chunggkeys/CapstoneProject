@@ -34,6 +34,10 @@ class MainWindow(QtWidgets.QMainWindow):
         #Load the UI Page
         uic.loadUi('mainwindow.ui', self)
 
+        #ui title and positioning
+        self.setWindowTitle("Mesomat Strain Apparatus")
+        self.setGeometry(0,0,800,479)
+
         #initialize modules
         self.control = control
         self.output = output
