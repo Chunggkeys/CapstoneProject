@@ -67,15 +67,29 @@ class MainWindow(QtWidgets.QMainWindow):
         self.curveDef = self.graph_def.plot()
         self.curveResist = self.graph_resist.plot()
 
+        #initialize dialog box
+        self.messageBox = QtWidgets.QMessageBox()
+
         #Initialize timer
         self.timer = pg.QtCore.QTimer()
         self.timer.timeout.connect(self.update)
+
+        #initialize event loop
+        self.eventTimer = pg.QtCore.QTimer()
+        self.eventTimer.timeout.connect(self.checkEvents)
+        self.eventTimer.start(50)
     
+    def checkEvents(self):
+        if not self.messageBox.isVisible():
+            message = OutputModule.readMessages()
+            if message:
+                self.displayMessage(message, 'info')
+
     def update(self):
         error = OutputModule.getError()
         if error:
             self.timer.stop()
-            self.displayMessage(error)
+            self.displayMessage(error, 'error')
         else:
             [ptr, x, dataDef, dataResist] = OutputModule.getData()
             if (ptr < OutputModule.DATA_BUFF_SIZE):
@@ -99,7 +113,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 errorMessage = ''
                 for p in invalid:
                     errorMessage = errorMessage + paramMappings[p] + ' must be positive and less than ' + maxParamMappings[p] + '\n'
-                self.displayMessage(errorMessage)
+                self.displayMessage(errorMessage, 'warning')
                 self.btn_start.setEnabled(False)
         
     def parseInputs(self):
@@ -114,7 +128,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         if (not l or not t or not d or not n or not
             p1 or not p2 or not p3 or not p4):
-            self.displayMessage('Cannot leave field empty')
+            self.displayMessage('Cannot leave field empty', 'warning')
             return {}
         else:
             return {
@@ -147,11 +161,17 @@ class MainWindow(QtWidgets.QMainWindow):
             self.input_ptt3.setReadOnly(True)
             self.input_ptt4.setReadOnly(True)
 
-    def displayMessage(self, message):
-        msg = QtWidgets.QMessageBox()
-        msg.setIcon(QtWidgets.QMessageBox.Information)
-        msg.setText(message)
-        msg.exec()
+    def displayMessage(self, message, type):
+        msgType = QtWidgets.QMessageBox.Information
+        if type == 'error':
+            msgType = QtWidgets.QMessageBox.Critical
+        elif type == 'warning':
+            msgType = QtWidgets.QMessageBox.Warning
+
+        self.messageBox.setIcon(msgType)
+        self.messageBox.setText(message)
+        self.messageBox.setWindowTitle(type)
+        self.messageBox.exec()
 
 def main():
     app = QtWidgets.QApplication(sys.argv)

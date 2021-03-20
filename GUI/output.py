@@ -10,6 +10,7 @@ class Output():
         self.ptr = 1
 
         self.error = ''
+        self.messageBuffer = []
 
         self.initializeData()
     
@@ -54,5 +55,13 @@ class Output():
     
     def getError(self):
         return self.error
+
+    def addMessage(self, message):
+        self.messageBuffer.append(message)
+    
+    def readMessages(self):
+        if self.messageBuffer:
+            return self.messageBuffer.pop(0)
+        return None
 
 OutputModule = Output()
