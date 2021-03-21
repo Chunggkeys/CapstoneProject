@@ -101,28 +101,29 @@ class Data:
 
     # work in progress function - *Needs more testing*
     def uploadToDatabase(self, label):
-        con = DBConnector(user='alexander.dingwall@mesomat.com', \
-                  password='2018', \
-                  host='localhost')
+        self.saveToCSV()
+        # con = DBConnector(user='alexander.dingwall@mesomat.com', \
+        #           password='2018', \
+        #           host='localhost')
 
-        con.connect()
+        # con.connect()
 
-        date = datetime.now().strftime("%Y-%m-%d") # date looks like '2020-03-20'
-        sampleIds = []
+        # date = datetime.now().strftime("%Y-%m-%d") # date looks like '2020-03-20'
+        # sampleIds = []
 
-        if (',' in label):
-            labels = label.split(',')
-            for l in labels:
-                if (con.get_by_label(l.upper() if len(l) <= 2 else l, 'samples', verbose = True) == -1):
-                    con.add_sample(l.upper() if len(l) <= 2 else l,description='This sample was created automatically to match a data file added through Python.Please fill in the appropriate information.')
-                sampleIds.append(con.get_by_label(l.upper() if len(l) <= 2 else l, 'samples', verbose = False))
-        elif (con.get_by_label(label.upper() if len(label) <= 2 else label, 'samples', verbose = True) == -1):
-            con.add_sample(label.upper() if len(label) <= 2 else label,description='This sample was created automatically to match a data file added through Python. Please fill in the appropriate information.')
-            sampleIds.append(con.get_by_label(label.upper() if len(label) <= 2 else label, 'samples', verbose = False))         
-        else:
-            sampleIds.append(con.get_by_label(label.upper() if len(label) <= 2 else label, 'samples', verbose = False))   
+        # if (',' in label):
+        #     labels = label.split(',')
+        #     for l in labels:
+        #         if (con.get_by_label(l.upper() if len(l) <= 2 else l, 'samples', verbose = True) == -1):
+        #             con.add_sample(l.upper() if len(l) <= 2 else l,description='This sample was created automatically to match a data file added through Python.Please fill in the appropriate information.')
+        #         sampleIds.append(con.get_by_label(l.upper() if len(l) <= 2 else l, 'samples', verbose = False))
+        # elif (con.get_by_label(label.upper() if len(label) <= 2 else label, 'samples', verbose = True) == -1):
+        #     con.add_sample(label.upper() if len(label) <= 2 else label,description='This sample was created automatically to match a data file added through Python. Please fill in the appropriate information.')
+        #     sampleIds.append(con.get_by_label(label.upper() if len(label) <= 2 else label, 'samples', verbose = False))         
+        # else:
+        #     sampleIds.append(con.get_by_label(label.upper() if len(label) <= 2 else label, 'samples', verbose = False))   
 
-        con.add_data(f[:-4],  os.path.join(dirpath,f), samples=sampleIds, data_type = test_type, date_created=date)
+        # con.add_data(f[:-4],  os.path.join(dirpath,f), samples=sampleIds, data_type = test_type, date_created=date)
 
-        con.disconnect()
+        # con.disconnect()
 
