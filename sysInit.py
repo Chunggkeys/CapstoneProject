@@ -6,7 +6,7 @@ import time
 # from GUI.output import *
 # from GUI.gui import initGUI
 # from ioInterface import *
-# from data import Data, Common
+# from database.data import Data, Common
 ########
 
 ## Placeholder classes 
