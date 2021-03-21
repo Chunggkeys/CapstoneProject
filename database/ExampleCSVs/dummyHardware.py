@@ -88,7 +88,6 @@ class DummyHW:
         except:
             pass
         return value
-        return 
 
     def getResistance(self, fiber_index):
         value = None
