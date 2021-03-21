@@ -2,7 +2,8 @@ import time
 
 ####### Uncomment when flipping devMode to False, comment when flipping to True
 # from pySMC100.smc100 import * 
-from multiprocessing import Process
+# from multiprocessing import Process
+import threading
 from GUI.control import *
 from GUI.output import *
 from GUI.gui import initGUI
@@ -28,14 +29,14 @@ class SampleGUIControl:
         time.sleep(1)
         print("Grabbed data from display")
         self.data = { 
-            'length' : 10,
-            'thick' : 2,
-            'defn' : 3,
-            'ptt1' : 25,
-            'ptt2' : 30,
-            'ptt3' : 35,
-            'ptt4' : 40,
-            'nCycles' : 5 
+            'l' : 10,
+            't' : 2,
+            'd' : 3,
+            'p1' : 25,
+            'p2' : 30,
+            'p3' : 35,
+            'p4' : 40,
+            'n' : 5 
         }
         return self.data
     
@@ -81,6 +82,11 @@ class SampleDB:
     
     def uploadToDatabase(self, label):
         print("Uploading to database")
+        return
+    
+    def appendData(self, **kwargs):
+        print("adding data to buffer")
+        return
 
 class SampleDBKeys:
     key_time = "Time"
@@ -94,7 +100,7 @@ class SampleDBKeys:
     key_vol3 = "V3"
     key_temp = "Temperature"
     key_stime = "Sample Time"
-    keympos = "Motor Position"
+    key_mpos = "Motor Position"
 
 class SampleHW:
     def __init__(self):
@@ -104,14 +110,14 @@ class SampleHW:
     def msg(self):
         return self.msg
     
-    def read_R(devMode=False):
+    def read_R(self,devMode=False):
         if devMode:
             return [20,2,20,20]
         else:
             #TODO
             return 0
 
-    def read_T(devMode=False):
+    def read_T(self,devMode=False):
         if devMode:
             return 20
         else:
@@ -132,7 +138,7 @@ class SampleMotor:
     
     def move_relative_mm(self, dist_mm, waitStop=True):
         time.sleep(1)
-        print("Moving stage downwards to ", dist_mm)
+        print("Moving stage to ", dist_mm)
     
     def get_position_mm(self):
         return 4
@@ -156,8 +162,10 @@ def guiInit(devMode=False):
     else:
         guiOutput = Output()
         guiControl = Control()
-        p = Process(target=initGUI, args=(guiControl,guiOutput,))
-        p.start()
+        t = threading.Thread(target=initGUI, args=(guiControl,guiOutput,))
+        t.start()
+        # p = Process(target=initGUI, args=(guiControl,guiOutput,))
+        # p.start()
         # p.join()
         # initGUI(guiControl, guiOutput)
         

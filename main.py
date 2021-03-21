@@ -34,13 +34,15 @@ startPressed = False
 dbData = {}
 
 while 1:
+    print("Awaiting test start")
     while 1:
         inputData = guiControl.getDataBuffer()
-        print(inputData)
         if inputData is not None:
-            totalCycles = inputData['nCycles']
-            displacement = inputData['length']
+            totalCycles = inputData['n']
+            displacement = inputData['d']
             guiControl.clearDataBuffer()
+            inputDataBuffer = {}
+            curState = HOMING_STATE
             break
     #
 
@@ -66,7 +68,8 @@ while 1:
             # Motor displaces downward
             data = hw.read_R(devMode)
             temp = hw.read_T(devMode)
-
+            
+            print(curState)
             # Change to something better
             t = time.time()
             pos  = motor.get_position_mm()
