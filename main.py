@@ -65,9 +65,12 @@ while 1:
             # Motor displaces downward
             data = hw.read_R(devMode)
             temp = hw.read_T(devMode)
-            guiOutput.update(x, 3, data)
 
-            dbData[dbKeys.key_time] = time.time()
+            # Change to something better
+            t = time.time()
+            guiOutput.update(t, 3, data)
+
+            dbData[dbKeys.key_time] = t
             dbData[dbKeys.key_mpos] = motor.get_position_mm()
             dbData[dbKeys.key_res0] = data[0]
             dbData[dbKeys.key_res1] = data[1]
@@ -82,7 +85,7 @@ while 1:
                 curState += 1; curCycle += 1
             else:
                 curState = TEST_COMPLETE_STATE
-                
+
         elif curState == MOVING_UP_STATE:
             # Motor displaces upward
             motor.move_relative_mm(-displacement)
