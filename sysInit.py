@@ -1,11 +1,12 @@
 import time
 
-####### Uncomment when flipping devMode to False
+####### Uncomment when flipping devMode to False, comment when flipping to True
 # from pySMC100.smc100 import * 
 # from GUI.control import *
 # from GUI.output import *
-# import GUI.gui as gui
+# from GUI.gui import initGUI
 # from ioInterface import *
+# from data import Data, Common
 ########
 
 ## Placeholder classes 
@@ -76,6 +77,23 @@ class SampleDB:
         self.data = data
         print("data sent")
         return
+    
+    def uploadToDatabase(self, label):
+        print("Uploading to database")
+
+class SampleDBKeys:
+    key_time = "Time"
+    key_res0 = "R0"
+    key_res1 = "R1"
+    key_res2 = "R2"
+    key_res3 = "R3"
+    key_vol0 = "V0"
+    key_vol1 = "V1"
+    key_vol2 = "V2"
+    key_vol3 = "V3"
+    key_temp = "Temperature"
+    key_stime = "Sample Time"
+    keympos = "Motor Position"
 
 class SampleHW:
     def __init__(self):
@@ -84,6 +102,20 @@ class SampleHW:
 
     def msg(self):
         return self.msg
+    
+    def read_R(devMode=False):
+        if devMode:
+            return [20,2,20,20]
+        else:
+            #TODO
+            return 0
+
+    def read_T(devMode=False):
+        if devMode:
+            return 20
+        else:
+            #TODO
+            return 0
 
 class SampleMotor:
     def __init__(self):
@@ -100,6 +132,9 @@ class SampleMotor:
     def move_relative_mm(self, dist_mm, waitStop=True):
         time.sleep(1)
         print("Moving stage downwards to ", dist_mm)
+    
+    def get_position_mm(self):
+        return 4
 ##
 
 def mechSysInit(port, devMode=False):
@@ -120,13 +155,17 @@ def guiInit(devMode=False):
     else:
         guiOutput = Output()
         guiControl = Control()
-        gui.main() #?????
+        initGUI(guiControl, guiOutput)
         
     return guiOutput, guiControl
 
 def dbInit(devMode=False):
-    db = SampleDB()
-    return db
+    if devMode:
+        db = SampleDB()
+        return db, SampleDBKeys
+    else:
+        db = Data()
+        return db, Common
 
 def hwInit(devMode=False):
     if devMode:
