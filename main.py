@@ -68,10 +68,11 @@ while 1:
 
             # Change to something better
             t = time.time()
-            guiOutput.update(t, 3, data)
+            pos  = motor.get_position_mm()
+            guiOutput.update(t, pos, data)
 
             dbData[dbKeys.key_time] = t
-            dbData[dbKeys.key_mpos] = motor.get_position_mm()
+            dbData[dbKeys.key_mpos] = pos
             dbData[dbKeys.key_res0] = data[0]
             dbData[dbKeys.key_res1] = data[1]
             dbData[dbKeys.key_res2] = data[2]
