@@ -1,8 +1,8 @@
 from manager import Manager
 from sysInit import *
-from multiprocessing import Process, Queue
+# from multiprocessing import Process, Queue
 import time
-import functions
+# import functions
 
 # import gui
 # import hardware functions
@@ -25,7 +25,7 @@ calibrationDisplacement = 0
 
 # measurementData = Queue()
 motor = mechSysInit(PORT, devMode)
-guiOutput, guiControl = guiInit(devMode)
+guiOutput, guiControl = guiInit()
 db, dbKeys = dbInit(devMode)
 hw = hwInit(devMode)
 
@@ -36,6 +36,7 @@ dbData = {}
 while 1:
     while 1:
         inputData = guiControl.getDataBuffer()
+        print(inputData)
         if inputData is not None:
             totalCycles = inputData['nCycles']
             displacement = inputData['length']

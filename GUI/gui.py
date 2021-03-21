@@ -2,7 +2,7 @@ from PyQt5 import QtWidgets, uic, QtGui
 from pyqtgraph import PlotWidget
 import pyqtgraph as pg
 import sys
-from constants import *
+from .constants import *
 
 paramMappings = {
     'l': 'Length',
@@ -32,7 +32,7 @@ class MainWindow(QtWidgets.QMainWindow):
         super(MainWindow, self).__init__(*args, **kwargs)
 
         #Load the UI Page
-        uic.loadUi('mainwindow.ui', self)
+        uic.loadUi('./GUI/mainwindow.ui', self)
 
         #ui title and positioning
         self.setWindowTitle("Mesomat Strain Apparatus")

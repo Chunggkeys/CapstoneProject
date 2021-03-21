@@ -2,9 +2,10 @@ import time
 
 ####### Uncomment when flipping devMode to False, comment when flipping to True
 # from pySMC100.smc100 import * 
-# from GUI.control import *
-# from GUI.output import *
-# from GUI.gui import initGUI
+from multiprocessing import Process
+from GUI.control import *
+from GUI.output import *
+from GUI.gui import initGUI
 # from ioInterface import *
 # from data import Data, Common
 ########
@@ -155,7 +156,10 @@ def guiInit(devMode=False):
     else:
         guiOutput = Output()
         guiControl = Control()
-        initGUI(guiControl, guiOutput)
+        p = Process(target=initGUI, args=(guiControl,guiOutput,))
+        p.start()
+        # p.join()
+        # initGUI(guiControl, guiOutput)
         
     return guiOutput, guiControl
 
