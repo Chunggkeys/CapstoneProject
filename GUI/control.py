@@ -1,28 +1,22 @@
 from constants import *
 
 class Control:
-    #temp values
-    # MAX_LENGTH = 100
-    # MAX_THICK = 20
-    # MAX_DEF = 50
-    # MAX_CYCLES = 65535
-    # MAX_POT = 2000
-
     def __init__(self):
         self.dataBuffer = None
         self.running = False
+        self.isStopPressed = False
     
     def setDataBuffer(self, params):
         self.dataBuffer = params
     
-    def setRunning(self, value):
-        self.running = value
+    def setStopPressed(self, value):
+        self.isStopPressed = value
 
     def getDataBuffer(self):
         return self.dataBuffer
     
-    def getRunning(self):
-        return self.running
+    def isStopPressed(self):
+        return self.isStopPressed
     
     def clearDataBuffer(self):
         self.dataBuffer = None
