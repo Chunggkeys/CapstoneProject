@@ -66,14 +66,19 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.graph_resist.setLabel('bottom', 'Time', 's')
         self.graph_resist.setLabel('left', 'Resistance', '\u03A9')
-        # self.graph_resist.setYRange(0, 1.2, padding=0.1)
+
+        self.graph_resist.addLegend(offset=(1,1), colCount=4, labelTextSize='6pt')
 
         self.curvePos = self.graph_pos.plot()
 
-        self.curveResist0 = self.graph_resist.plot()
-        self.curveResist1 = self.graph_resist.plot()
-        self.curveResist2 = self.graph_resist.plot()
-        self.curveResist3 = self.graph_resist.plot()
+        pen0 = pg.mkPen(color=(255, 145, 71))
+        self.curveResist0 = self.graph_resist.plot(pen=pen0, name="Res 0")
+        pen1 = pg.mkPen(color=(131, 250, 122))
+        self.curveResist1 = self.graph_resist.plot(pen=pen1, name="Res 1")
+        pen2 = pg.mkPen(color=(121, 154, 252))
+        self.curveResist2 = self.graph_resist.plot(pen=pen2, name="Res 2")
+        pen3 = pg.mkPen(color=(232, 113, 245))
+        self.curveResist3 = self.graph_resist.plot(pen=pen3, name="Res 3")
 
         #initialize dialog box
         self.messageBox = QtWidgets.QMessageBox()
@@ -155,6 +160,15 @@ class MainWindow(QtWidgets.QMainWindow):
             self.control.setStopPressed(False)
             self.timer.stop()
             self.btn_start.setText('Start')
+
+            self.input_length.setReadOnly(False)
+            self.input_thick.setReadOnly(False)
+            self.input_def.setReadOnly(False)
+            self.input_nCycles.setReadOnly(False)
+            self.input_ptt1.setReadOnly(False)
+            self.input_ptt2.setReadOnly(False)
+            self.input_ptt3.setReadOnly(False)
+            self.input_ptt4.setReadOnly(False)
         else:
             params = self.parseInputs()
             if params:
@@ -163,25 +177,23 @@ class MainWindow(QtWidgets.QMainWindow):
                 if not invalid:
                     self.control.setDataBuffer(params)
                     self.graph_pos.setYRange(0, params['d'], padding=0.1)
-                    self.btn_start.setEnabled(True)
 
                     self.timer.start(50)
                     self.btn_start.setText('Stop')
 
-                    # self.input_length.setReadOnly(True)
-                    # self.input_thick.setReadOnly(True)
-                    # self.input_def.setReadOnly(True)
-                    # self.input_nCycles.setReadOnly(True)
-                    # self.input_ptt1.setReadOnly(True)
-                    # self.input_ptt2.setReadOnly(True)
-                    # self.input_ptt3.setReadOnly(True)
-                    # self.input_ptt4.setReadOnly(True)
+                    self.input_length.setReadOnly(True)
+                    self.input_thick.setReadOnly(True)
+                    self.input_def.setReadOnly(True)
+                    self.input_nCycles.setReadOnly(True)
+                    self.input_ptt1.setReadOnly(True)
+                    self.input_ptt2.setReadOnly(True)
+                    self.input_ptt3.setReadOnly(True)
+                    self.input_ptt4.setReadOnly(True)
                 else: 
                     errorMessage = ''
                     for p in invalid:
                         errorMessage = errorMessage + paramMappings[p] + ' must be positive and less than ' + maxParamMappings[p] + '\n'
                     self.displayMessage(errorMessage, 'warning')
-                    self.btn_start.setEnabled(False)
 
     def displayMessage(self, message, type):
         msgType = QtWidgets.QMessageBox.Information

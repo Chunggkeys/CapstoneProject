@@ -50,19 +50,19 @@ class Output():
             self.ptr +=1 
         else:
             self.dataPos[:-1] = self.dataPos[1:]
-            self.dataPos[-1] = motorPos[0]
+            self.dataPos[-1] = motorPos
 
-            self.dataResist0[:-1] = self.dataResist[1:]
-            self.dataResist0[-1] = resist[0]
+            self.dataResist0[:-1] = self.dataResist0[1:]
+            self.dataResist0[-1] = resistance[0]
 
             self.dataResist1[:-1] = self.dataResist1[1:]
-            self.dataResist1[-1] = resist[1]
+            self.dataResist1[-1] = resistance[1]
 
             self.dataResist2[:-1] = self.dataResist2[1:]
-            self.dataResist2[-1] = resist[2]
+            self.dataResist2[-1] = resistance[2]
 
             self.dataResist3[:-1] = self.dataResist3[1:]
-            self.dataResist3[-1] = resist[3]
+            self.dataResist3[-1] = resistance[3]
 
             self.ptr +=  1
 
