@@ -47,6 +47,7 @@ class DummyHW:
             for line in lines:
                 for i, elem in enumerate(line.strip("\n").split(",")):
                     key = ""
+                    elem = float(elem)
                     try:
                         key = arrays[indexs.index(i)]
                     except:
@@ -73,7 +74,7 @@ class DummyHW:
                         self.MotorPosition.append(elem)
         
 
-    def getVoltages(self, fiber_index):
+    def getVoltage(self, fiber_index):
         value = None
         try:
             if fiber_index == 0:

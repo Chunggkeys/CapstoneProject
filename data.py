@@ -1,8 +1,25 @@
 from datetime import datetime
 from mesomatdbtools.dbconnector import DBConnector
+from dataclasses import dataclass
 import numpy as np
 
+@dataclass
+class Common:
+        key_time = "Time"
+        key_res0 = "R0"
+        key_res1 = "R1"
+        key_res2 = "R2"
+        key_res3 = "R3"
+        key_vol0 = "V0"
+        key_vol1 = "V1"
+        key_vol2 = "V2"
+        key_vol3 = "V3"
+        key_temp = "Temperature"
+        key_stime = "Sample Time"
+        key_mpos = "Motor Position"
+        
 class Data:
+
     def __init__(self):
         self.testName = "TempName"
         # Timestamp
@@ -26,51 +43,62 @@ class Data:
         for key, val in kwargs.items():
             if val == None:
                 continue # dont append if no value
-            if key == "Time":
+            if key == Common.key_time:
                 self.Time.append(val)
-            elif key == "R0":
+            elif key == Common.key_res0:
                 self.R0.append(val)
-            elif key == "R1":
+            elif key == Common.key_res1:
                 self.R1.append(val)
-            elif key == "R2":
+            elif key == Common.key_res2:
                 self.R2.append(val)
-            elif key == "R3":
+            elif key == Common.key_res3:
                 self.R3.append(val)
-            elif key == "V0":
+            elif key == Common.key_vol0:
                 self.V0.append(val)
-            elif key == "V1":
+            elif key == Common.key_vol1:
                 self.V1.append(val)
-            elif key == "V2":
+            elif key == Common.key_vol2:
                 self.V2.append(val)
-            elif key == "V3":
+            elif key == Common.key_vol3:
                 self.V3.append(val)
-            elif key == "Temp":
+            elif key == Common.key_temp:
                 self.Temp.append(val)
-            elif key == "SampleTime":
+            elif key == Common.key_stime:
                 self.SampleTime.append(val)
-            elif key == "MotorPosition":
+            elif key == Common.key_mpos:
                 self.MotorPosition.append(val)
 
     def _getDataTuple(self):
-        output = (  ["Time"] + self.Time,
-                    ["R0"] + self.R0,
-                    ["R1"] + self.R1,
-                    ["R2"] + self.R2,
-                    ["R3"] + self.R3,
-                    ["V0"] + self.V0,
-                    ["V1"] + self.V1,
-                    ["V2"] + self.V2,
-                    ["V3"] + self.V3,
-                    ["Temp"] + self.Temp,
-                    ["SampleTime"] + self.SampleTime,
-                    ["MotorPosition"] + self.MotorPosition
+        output = (  [Common.key_time] + self.Time,
+                    [Common.key_res0] + self.R0,
+                    [Common.key_res1] + self.R1,
+                    [Common.key_res2] + self.R2,
+                    [Common.key_res3] + self.R3,
+                    [Common.key_vol0] + self.V0,
+                    [Common.key_vol1] + self.V1,
+                    [Common.key_vol2] + self.V2,
+                    [Common.key_vol3] + self.V3,
+                    [Common.key_temp] + self.Temp,
+                    [Common.key_stime] + self.SampleTime,
+                    [Common.key_mpos] + self.MotorPosition
                  )
         return output
 
     # used for mysql upload and safety in case crash during upload
     def saveToCSV(self):
         data_tuple = self._getDataTuple()
-        np.savetxt('data.csv', data_tuple, delimiter=',')
+        
+        with open("test_data.csv", 'w') as fw:
+            
+            for j in range(len(self.R0)):
+                temp_line = ""
+                for i in range(len(data_tuple)):
+                    try:
+                        temp_line += str(data_tuple[i][j]) + ","
+                    except:
+                        temp_line += "-1" + ","
+                
+                fw.write(temp_line[:-1]+"\n")
 
 
     def uploadToDatabase(self, label):
