@@ -19,7 +19,6 @@ class Common:
         key_mpos = "Motor Position"
         
 class Data:
-
     def __init__(self):
         self.testName = "TempName"
         # Timestamp
@@ -100,7 +99,7 @@ class Data:
                 
                 fw.write(temp_line[:-1]+"\n")
 
-
+    # work in progress function - *Needs more testing*
     def uploadToDatabase(self, label):
         con = DBConnector(user='alexander.dingwall@mesomat.com', \
                   password='2018', \
