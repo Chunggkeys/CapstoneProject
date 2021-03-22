@@ -201,9 +201,24 @@ def ADCRead():
 			
 	return voltage_array
 
+def read_R(Pot):
+	resistance = [0, 0, 0, 0]
+	VIn = 5
+	voltage_array = ADCRead()
 
-while True
+	
+	for x in range(4):
+		resistance[x] = (voltage_array[x] * Pot[x])/(VIn - voltage_array[x])
+	
+	return resistance
 
-	ADCRead():
-	time.sleep(0.5)
+
+def read_T(Pot):
+	resistance = 0
+	VIn = 5
+	voltage_array = ADCRead()
+
+	resistance= (voltage_array[4] * Pot)/(VIn - voltage_array[4])
+	
+	return resistance
 
