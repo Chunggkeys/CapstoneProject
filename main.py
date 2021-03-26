@@ -15,14 +15,15 @@ from controller import Controller
 PORT = "/dev/ttyUSB0"
 devMode = True
 
-IDLE_STATE = 0
-HOMING_STATE = 1
-CALIBRATING_STATE = 2
-MOVING_DOWN_STATE = 3
-MOVING_UP_STATE = 4 
-FAULTED_STATE = 5
-TEST_COMPLETE_STATE = 6
-FAILED_STATE = -1
+IDLE_STATE                  = 0
+HOMING_STATE                = 1
+CALIBRATING_STATE           = 2
+MOVING_DOWN_STATE           = 3
+MOVING_UP_STATE             = 4 
+FAULTED_STATE               = 5
+TEST_COMPLETE_STATE         = 6
+FAILED_STATE                = -1
+
 curCycle = 1
 totalCycles = 0; displacement = 0
 calibrationDisplacement = 14
@@ -33,6 +34,7 @@ motor = mechSysInit(PORT, devMode)
 guiOutput, guiControl = guiInit(devMode)
 db, dbKeys = dbInit(devMode)
 hw = hwInit(devMode)
+control = Controller(motor)
 
 curState = IDLE_STATE
 startPressed = False
@@ -49,9 +51,11 @@ while 1:
             break
     
     totalDisplacement = displacement + calibrationDisplacement
-    control = Controller(motor, totalCycles, displacement, calibrationDisplacement)
+    # control = Controller(motor, totalCycles, displacement, calibrationDisplacement)
+    control.setParams(totalCycles, displacement, calibrationDisplacement)
 
-    control.run()
+    t = threading.Thread(target=control.run, args=(,))
+    t.start()
     while 1:
         state = control.getCurState()
         if state == MOVING_DOWN_STATE or state == MOVING_UP_STATE:
@@ -70,7 +74,13 @@ while 1:
             dbData[dbKeys.key_res3] = data[3]
             
             db.appendData(**dbData)
-        elif state == :
+            guioutput.update(t, pos, data)
+        elif state == CALIBRATING_STATE:
+            data = hw.read_R(devMode)
+            control.setCalibrationResistances(data)
+        elif state == FAILED_STATE:
+            guiOutput.addMessage("Test has failed")
+            break
 
             
     # At this point, gui will have user input already

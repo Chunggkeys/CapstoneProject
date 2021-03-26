@@ -120,6 +120,7 @@ class SampleHW:
 class SampleMotor:
     def __init__(self):
         self.msg = "this is a sample motor"
+        self.status = '1'
         print("Initializing motor...")
 
     def msg(self):
@@ -129,12 +130,21 @@ class SampleMotor:
         print("Homing motor")
         return 0
     
+    def stop(self):
+        print("Stopped motor")
+        
     def move_relative_mm(self, dist_mm, waitStop=True):
         time.sleep(1)
         print("Moving stage downwards to ", dist_mm)
     
     def get_position_mm(self):
         return 4
+    
+    def move_absolute_mm(self, absolute_dist_mm, waitStop=True):
+        print("Moving stage to ", absolute_dist_mm)
+    
+    def get_status(self):
+        return self.status
 ##
 
 def mechSysInit(port, devMode=False):
