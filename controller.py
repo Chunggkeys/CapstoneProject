@@ -1,10 +1,6 @@
 class Controller:
-    def __init__(self, motor, totalCycles, displacement, calibrationValue):
+    def __init__(self, motor):
         self.motor = motor
-        self.totalCycles = totalCycles
-        self.calibrationValue = calibrationValue
-            
-        self.totalDisplacement = self.calibrationValue + displacement
 
         self.idleState = 0
         self.homingState = 1
@@ -15,14 +11,26 @@ class Controller:
         self.testCompleteState = 6
         self.failedState = -1
 
+        self.calibrationResistances = [0,0,0,0]
+        self.zeros = [0,0,0,0]
+
     def run(self):
         self.curState = self.homingState
         self.curCycle = 1
 
         while 1:
             self.status = self.motor.get_status()[1][0]
+            if self.status == '0' or self.status == '10' or self.status == '11':
+                self.curState = faultedState
+
             if self.curState == self.calibratingState:
                 # calibration value currently set to 14
+
+                # LEFT OFF HERE, CREATE SAMPLE TESTERS
+                if self.calibrationResistances != self.zeros:
+                    self.curState += 1
+                
+
                 self.motor.move_absolute_mm(14)
                 self.curState += 1
         
@@ -39,7 +47,6 @@ class Controller:
                 pos = self.motor.get_position_mm()
 
                 if pos <= self.calibrationValue:   
-                    # Is the stop necessary?
                     self.motor.stop()
                     if self.curCycle == self.totalCycles:
                         self.curState = self.testCompleteState
@@ -51,12 +58,20 @@ class Controller:
                 self.motor.move_absolute_mm(self.calibrationValue)
             
             elif self.curState == self.failedState:
-                self.motor.home()
-                self.curState = self.homingState
+                # self.motor.home()
+                # self.curState = self.homingState
                 break
 
         return
-        
+
+    def setParams(self, totalCycles, displacement, calibrationDisplacement):
+        self.totalCycles = totalCycles        
+        self.calibrationValue = calibrationValue
+        self.totalDisplacement = self.calibrationValue + displacement
+
+    def setCalibrationResistances(self, resistanceArr):
+        self.calibrationResistances = resistanceArr
+
     def getCurState(self):
         return self.curState
     
