@@ -120,7 +120,7 @@ class SampleHW:
 class SampleMotor:
     def __init__(self):
         self.msg = "this is a sample motor"
-        self.status = '1'
+        self.status = [['0'],['1']]
         print("Initializing motor...")
 
     def msg(self):

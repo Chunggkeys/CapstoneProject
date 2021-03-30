@@ -1,3 +1,5 @@
+import threading
+
 class Controller:
     def __init__(self, motor):
         self.motor = motor
@@ -13,9 +15,10 @@ class Controller:
 
         self.calibrationResistances = [0,0,0,0]
         self.zeros = [0,0,0,0]
+        self.curState = self.idleState
 
     def run(self):
-        self.curState = self.homingState
+        self.curState = self.calibratingState
         self.curCycle = 1
 
         while 1:
@@ -25,6 +28,7 @@ class Controller:
 
             if self.curState == self.calibratingState:
                 # calibration value currently set to 14
+                self.motor.move_absolute_mm(14)
 
                 # LEFT OFF HERE, CREATE SAMPLE TESTERS
                 if self.calibrationResistances != self.zeros:
@@ -55,7 +59,10 @@ class Controller:
     
             elif self.curState == self.faultedState:
                 # Retry curent cycle
-                self.motor.move_absolute_mm(self.calibrationValue)
+                self.motor.stop()
+                self.motor.move_absolute_mm(self.calibrationValue, waitStop=False)
+                if status == '32' or status == '33':
+                    self.curState = self.failedState
             
             elif self.curState == self.failedState:
                 # self.motor.home()
@@ -64,7 +71,7 @@ class Controller:
 
         return
 
-    def setParams(self, totalCycles, displacement, calibrationDisplacement):
+    def setParams(self, totalCycles, displacement, calibrationValue):
         self.totalCycles = totalCycles        
         self.calibrationValue = calibrationValue
         self.totalDisplacement = self.calibrationValue + displacement
