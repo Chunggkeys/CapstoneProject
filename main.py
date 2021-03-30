@@ -2,9 +2,9 @@ from manager import Manager
 from sysInit import *
 # from multiprocessing import Process, Queue
 
-
+import threading
 import time
-import functions
+# import functions
 
 from controller import Controller
 
@@ -51,10 +51,9 @@ while 1:
             break
     
     totalDisplacement = displacement + calibrationDisplacement
-    # control = Controller(motor, totalCycles, displacement, calibrationDisplacement)
     control.setParams(totalCycles, displacement, calibrationDisplacement)
 
-    t = threading.Thread(target=control.run, args=(,))
+    t = threading.Thread(target=control.run, args=())
     t.start()
     while 1:
         state = control.getCurState()
