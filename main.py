@@ -58,12 +58,12 @@ while 1:
     while 1:
         state = control.getCurState()
         if state == MOVING_DOWN_STATE or state == MOVING_UP_STATE:
-            data = hw.read_R(devMode)
-            temp = hw.read_T(devMode)
+            data = hw.read_R()
+            temp = hw.read_T()
 
             t = time.time()
             pos  = motor.get_position_mm()
-            guiOutput.update(t, pos, data)
+            # guiOutput.update(t, pos, data)
 
             dbData[dbKeys.key_time] = t
             dbData[dbKeys.key_mpos] = pos
@@ -75,7 +75,7 @@ while 1:
             db.appendData(**dbData)
             guioutput.update(t, pos, data)
         elif state == CALIBRATING_STATE:
-            data = hw.read_R(devMode)
+            data = hw.read_R()
             control.setCalibrationResistances(data)
         elif state == FAILED_STATE:
             guiOutput.addMessage("Test has failed")
