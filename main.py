@@ -31,7 +31,7 @@ totalDisplacement = 0
 
 # measurementData = Queue()
 motor = mechSysInit(PORT, devMode)
-guiOutput, guiControl = guiInit(devMode)
+guiOutput, guiControl = guiInit()
 db, dbKeys = dbInit(devMode)
 hw = hwInit(devMode)
 control = Controller(motor)
@@ -41,11 +41,12 @@ startPressed = False
 dbData = {}
 
 while 1:
+    print("Awaiting test start")
     while 1:
         inputData = guiControl.getDataBuffer()
         if inputData is not None:
-            totalCycles = inputData['nCycles']
-            displacement = inputData['length']
+            totalCycles = inputData['n']
+            displacement = inputData['d']
             guiControl.clearDataBuffer()
             curState = CALIBRATING_STATE
             break
@@ -60,7 +61,6 @@ while 1:
         if state == MOVING_DOWN_STATE or state == MOVING_UP_STATE:
             data = hw.read_R(devMode)
             temp = hw.read_T(devMode)
-
             t = time.time()
             pos  = motor.get_position_mm()
             guiOutput.update(t, pos, data)
