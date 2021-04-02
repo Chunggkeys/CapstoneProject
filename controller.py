@@ -1,5 +1,7 @@
 import threading
 
+FULL_DISPLACEMENT = 50
+
 class Controller:
     def __init__(self, motor):
         self.motor = motor
@@ -28,12 +30,11 @@ class Controller:
 
             if self.curState == self.calibratingState:
                 # calibration value currently set to 14
-                self.motor.move_absolute_mm(14)
+                self.motor.move_absolute_mm(FULL_DISPLACEMENT, waitStop=False)
 
                 # LEFT OFF HERE, CREATE SAMPLE TESTERS
                 if self.calibrationResistances != self.zeros:
                     self.curState += 1
-                
 
                 self.motor.move_absolute_mm(14)
                 self.curState += 1
@@ -68,7 +69,6 @@ class Controller:
                 # self.motor.home()
                 # self.curState = self.homingState
                 break
-
         return
 
     def setParams(self, totalCycles, displacement, calibrationValue):

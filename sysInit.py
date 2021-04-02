@@ -7,8 +7,7 @@ import time
 # from GUI.gui import initGUI
 # from ioInterface import *
 # from database.data import Data, Common
-# from spiConfig import initialisation1, initialisation2
-# from measurementModule import 
+# from measurementModule import HW
 ########
 
 ## Placeholder classes 
@@ -105,19 +104,11 @@ class SampleHW:
     def msg(self):
         return self.msg
     
-    def read_R(devMode=False):
-        if devMode:
-            return [20,2,20,20]
-        else:
-            #TODO
-            return 0
+    def read_R(self):
+        return [20,2,20,20]
 
-    def read_T(devMode=False):
-        if devMode:
-            return 20
-        else:
-            #TODO
-            return 0
+    def read_T(self):
+        return 20
 
 class SampleMotor:
     def __init__(self):
@@ -183,7 +174,7 @@ def hwInit(devMode=False):
     if devMode:
         hw = SampleHW()
     else:
-        initialisation1()
-        initialisation2()
-        hw = IOInterface()
+        hw = HW()
+        hw.initialisation1()
+        hw.initialisation2()
     return hw
