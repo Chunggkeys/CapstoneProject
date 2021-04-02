@@ -7,6 +7,8 @@ import time
 # from GUI.gui import initGUI
 # from ioInterface import *
 # from database.data import Data, Common
+# from spiConfig import initialisation1, initialisation2
+# from measurementModule import 
 ########
 
 ## Placeholder classes 
@@ -181,5 +183,7 @@ def hwInit(devMode=False):
     if devMode:
         hw = SampleHW()
     else:
+        initialisation1()
+        initialisation2()
         hw = IOInterface()
     return hw
