@@ -1,4 +1,4 @@
-# import spiConfig
+#import spiConfig
 
 
 import spidev
@@ -54,7 +54,7 @@ class HW:
             GPIO.setup(CS_PIN[x],GPIO.OUT)
             GPIO.setup(DRDY_PIN[x],GPIO.IN)
 
-    def Reg_Write(address,data):    # write Fibonacci series up to 
+    def Reg_Write(self,address,data):    # write Fibonacci series up to 
         for x in range(NUM_PINS):
             print ("Writing %s to Register %s" %( hex(data),hex(address)))
             print(data);
@@ -75,7 +75,7 @@ class HW:
             GPIO.output(CS_PIN[x], True)
         return;
 
-    def Reg_read(address):    # write Fibonacci series up to
+    def Reg_read(self,address):    # write Fibonacci series up to
         for x in range(NUM_PINS):
             print ("Reading from Register %s" %(hex(address)))
             opcode1 = address | 0x20
@@ -96,7 +96,7 @@ class HW:
             print(resp);
         return;
 
-    def Spi_command(command):    # write Fibonacci series up to
+    def Spi_command(self, command):    # write Fibonacci series up to
         for x in range(NUM_PINS):
             GPIO.output(CS_PIN[x], False)
             time.sleep(0.002)               # sleep for 0.1 seconds
@@ -112,37 +112,37 @@ class HW:
         return;
 
 
-    def initialisation1():  
+    def initialisation1(self):  
         print ("INITIALISATION");
 
-        Spi_command(START);
+        self.Spi_command(START);
         time.sleep(0.1);
-        Spi_command(STOP);
+        self.Spi_command(STOP);
         time.sleep(0.1);
-        Spi_command(SDATAC);
+        self.Spi_command(SDATAC);
         time.sleep(0.3);
 
-        Reg_Write(0x00, 0x01);
+        self.Reg_Write(0x00, 0x01);
         time.sleep(0.01); 
-        Reg_Write(0x01, 0x04);
+        self.Reg_Write(0x01, 0x04);
         time.sleep(0.01); 
-        Reg_Write(0x02, 0b11010000);
+        self.Reg_Write(0x02, 0b11010000);
         time.sleep(0.01);
-        Reg_Write(0x03, 0x00);
+        self.Reg_Write(0x03, 0x00);
         time.sleep(0.01);
 
-        Reg_read(0x00);
+        self.Reg_read(0x00);
         time.sleep(0.1);
-        Reg_read(0x04);
+        self.Reg_read(0x04);
         time.sleep(0.1);
-        Reg_read(0x08);
+        self.Reg_read(0x08);
         time.sleep(0.1);
-        Reg_read(0x0c);
+        self.Reg_read(0x0c);
 
-        Spi_command(RDATAC);
+        self.Spi_command(RDATAC);
         time.sleep(0.3); 
 
-        Spi_command(START);
+        self.Spi_command(START);
         time.sleep(0.1);
         
         for x in range(NUM_PINS):
@@ -157,7 +157,7 @@ class HW:
             return digits[x]
         return toHex(rest) + digits[x]
 
-    def initialisation2():
+    def initialisation2(self):
 
         time.sleep(0.2)
         print ("STARTED")
@@ -168,7 +168,7 @@ class HW:
         return;
 
 
-    def Read_Data(x):
+    def Read_Data(self,x):
         volt = 0;
         buff = [0,0,0,0,0,0,0,0,0];
         #buff=array('b',[0,0,0,0,0,0,0,0,0])
@@ -211,20 +211,20 @@ class HW:
         return volt;
         #return r
 
-    def read_R(Pot):
+    def read_R(self, Pot):
         resistance = [0, 0, 0, 0]
         voltage_array = [0, 0, 0, 0]
 
 
         for x in range(4):
-            voltage_array[x] = Read_Data(x);
+            voltage_array[x] = self.Read_Data(x);
             resistance[x] = (voltage_array[x] * Pot[x])/(V_IN - voltage_array[x])
 
         return resistance
 
-    def read_T():
+    def read_T(self):
         resistance = 0
-        voltage = Read_Data(4)
+        voltage = self.Read_Data(4)
 
         temp_Calib = 28.82;
         temp = voltage/0.041276 + temp_Calib 
@@ -245,3 +245,4 @@ while True:
     t = hw.read_T()
     print(x, "mV", t, "C" )
     time.sleep(0.5)
+
