@@ -232,6 +232,9 @@ class HW:
 
         return temp
 
+    def close(self):
+        self.spi.close()
+
 
 
 # Test code
