@@ -55,6 +55,9 @@ while 1:
 
     t = threading.Thread(target=control.run, args=())
     t.start()
+    hw.initialisation1()
+    hw.initialisation2()
+    
     while 1:
         state = control.getCurState()
         if state == MOVING_DOWN_STATE or state == MOVING_UP_STATE:
@@ -81,6 +84,7 @@ while 1:
             guiOutput.addMessage("Test has failed")
             break
 
+    hw.close()
             
     # At this point, gui will have user input already
     # This loop controls motor 
