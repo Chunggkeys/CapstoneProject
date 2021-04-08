@@ -50,13 +50,14 @@ while 1:
             curState = CALIBRATING_STATE
             break
     
-    totalDisplacement = displacement + calibrationDisplacement
+    # totalDisplacement = displacement + calibrationDisplacement
     control.setParams(totalCycles, displacement, calibrationDisplacement)
+
+    hw.initialisation1()
+    hw.initialisation2()
 
     t = threading.Thread(target=control.run, args=())
     t.start()
-    hw.initialisation1()
-    hw.initialisation2()
     
     while 1:
         state = control.getCurState()
@@ -76,11 +77,12 @@ while 1:
             dbData[dbKeys.key_res3] = data[3]
             
             db.appendData(**dbData)
-            guioutput.update(t, pos, data)
+            guiOutput.update(t, pos, data)
         elif state == CALIBRATING_STATE:
             data = hw.read_R()
             control.setCalibrationResistances(data)
         elif state == FAILED_STATE:
+            controllerErrors = control.getErrorBuffer()
             guiOutput.addMessage("Test has failed")
             break
 

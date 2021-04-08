@@ -1,5 +1,3 @@
-import threading
-
 FULL_DISPLACEMENT = 50
 
 class Controller:
@@ -19,6 +17,8 @@ class Controller:
         self.zeros = [0,0,0,0]
         self.curState = self.idleState
 
+        self.errorBuffer = []
+
     def run(self):
         self.curState = self.calibratingState
         self.curCycle = 1
@@ -26,7 +26,8 @@ class Controller:
         while 1:
             self.status = self.motor.get_status()[1][0]
             if self.status == '0' or self.status == '10' or self.status == '11':
-                self.curState = faultedState
+                self.errorBuffer.append("Controller error code: " + self.status + "\n")
+                self.curState = self.faultedState
 
             if self.curState == self.calibratingState:
                 # calibration value currently set to 14
@@ -45,7 +46,7 @@ class Controller:
 
                 if pos >= self.totalDisplacement:
                     self.motor.stop()
-                    curState += 1
+                    self.curState += 1
 
             elif self.curState == self.movingUpState:
                 self.motor.move_absolute_mm(self.calibrationValue, waitStop=False)
@@ -59,10 +60,11 @@ class Controller:
                         self.curState -= 1; self.curCycle += 1
     
             elif self.curState == self.faultedState:
-                # Retry curent cycle
+                # Retry current cycle
                 self.motor.stop()
                 self.motor.move_absolute_mm(self.calibrationValue, waitStop=False)
-                if status == '32' or status == '33':
+                if self.status == '32' or self.status == '33':
+                    self.errorBuffer.append("Controller error code: " + self.status + "\nWARNING: Motor has not been reset\n")
                     self.curState = self.failedState
             
             elif self.curState == self.failedState:
@@ -78,6 +80,9 @@ class Controller:
 
     def setCalibrationResistances(self, resistanceArr):
         self.calibrationResistances = resistanceArr
+    
+    def getErrorBuffer(self):
+        return self.errorBuffer
 
     def getCurState(self):
         return self.curState
