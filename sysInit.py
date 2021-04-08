@@ -94,7 +94,7 @@ class SampleDBKeys:
     key_vol3 = "V3"
     key_temp = "Temperature"
     key_stime = "Sample Time"
-    keympos = "Motor Position"
+    key_mpos = "Motor Position"
 
 class SampleHW:
     def __init__(self):
