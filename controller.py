@@ -31,13 +31,13 @@ class Controller:
 
             if self.curState == self.calibratingState:
                 # calibration value currently set to 14
-                self.motor.move_absolute_mm(FULL_DISPLACEMENT, waitStop=False)
+                self.motor.move_absolute_mm(14)
 
                 # LEFT OFF HERE, CREATE SAMPLE TESTERS
-                if self.calibrationResistances != self.zeros:
-                    self.curState += 1
+                # if self.calibrationResistances != self.zeros:
+                #     self.curState += 1
 
-                self.motor.move_absolute_mm(14)
+                # self.motor.move_absolute_mm(14)
                 self.curState += 1
         
             elif self.curState == self.movingDownState:
@@ -71,11 +71,15 @@ class Controller:
                 # self.motor.home()
                 # self.curState = self.homingState
                 break
+        
+            elif self.curState == self.testCompleteState:
+                break
         return
 
     def setParams(self, totalCycles, displacement, calibrationValue):
         self.totalCycles = totalCycles        
-        self.calibrationValue = calibrationValue
+        # self.calibrationValue = calibrationValue
+        self.calibrationValue = 14
         self.totalDisplacement = self.calibrationValue + displacement
 
     def setCalibrationResistances(self, resistanceArr):
