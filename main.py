@@ -30,7 +30,7 @@ calibrationDisplacement = 14
 totalDisplacement = 0
 
 # measurementData = Queue()
-motor = mechSysInit(PORT, devMode)
+motor = mechSysInit(PORT, False)
 guiOutput, guiControl = guiInit(devMode)
 db, dbKeys = dbInit(devMode)
 hw = hwInit(devMode)
@@ -84,6 +84,9 @@ while 1:
         elif state == FAILED_STATE:
             controllerErrors = control.getErrorBuffer()
             guiOutput.addMessage("Test has failed")
+            break
+        elif state == TEST_COMPLETE_STATE:
+            guiOutput.addMessage("Test Complete!")
             break
 
     hw.close()

@@ -64,6 +64,12 @@ class SampleGUIOutput:
 
         def displayTestComplete(self):
             print("Test completed")
+        
+        def addMessage(self, msg):
+            print(msg)
+        
+        def update(self, t, pos, data):
+            print(str(t) + ", " + str(pos) + ", " + str(data) + "\n")
 
 
 class SampleDB:
@@ -109,6 +115,14 @@ class SampleHW:
 
     def read_T(self):
         return 20
+
+    def initialisation1(self):
+        print("Initializing hw via init1")
+        return
+
+    def initialisation2(self):
+        print("Initializing hw via init2")
+        return
 
 class SampleMotor:
     def __init__(self):
@@ -175,6 +189,8 @@ def hwInit(devMode=False):
         hw = SampleHW()
     else:
         hw = HW()
-        hw.initialisation1()
-        hw.initialisation2()
+        
+    hw.initialisation1()
+    hw.initialisation2()
+
     return hw
