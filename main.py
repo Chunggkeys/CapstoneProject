@@ -45,7 +45,8 @@ while 1:
         inputData = guiControl.getDataBuffer()
         if inputData is not None:
             totalCycles = inputData['nCycles']
-            displacement = inputData['length']
+            displacement = inputData['defn']
+
             guiControl.clearDataBuffer()
             curState = CALIBRATING_STATE
             break
@@ -61,12 +62,14 @@ while 1:
     
     while 1:
         state = control.getCurState()
+        pos = control.getPos()
+        #print("State: " + str(state))
+
         if state == MOVING_DOWN_STATE or state == MOVING_UP_STATE:
             data = hw.read_R()
             temp = hw.read_T()
 
             t = time.time()
-            pos  = motor.get_position_mm()
             # guiOutput.update(t, pos, data)
 
             dbData[dbKeys.key_time] = t
