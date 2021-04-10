@@ -1,7 +1,7 @@
 import time
 
 ####### Uncomment when flipping devMode to False, comment when flipping to True
-# from pySMC100.smc100 import * 
+from pySMC100.smc100 import * 
 # from GUI.control import *
 # from GUI.output import *
 # from GUI.gui import initGUI
@@ -52,24 +52,24 @@ class SampleGUIOutput:
         self.msg = "this is a sample gui output"
         print("Initializing gui output...")
 
-        def msg(self):
-            return self.msg
+    def msg(self):
+        return self.msg
+       
+    def sendData(self, data):
+        print("sending data to output")
+        return
         
-        def sendData(self, data):
-            print("sending data to output")
-            return
-        
-        def displayError(self, errorCode, msg):
-            print("Error sent to display with code: ",errorCode)
+    def displayError(self, errorCode, msg):
+        print("Error sent to display with code: ",errorCode)
 
-        def displayTestComplete(self):
-            print("Test completed")
+    def displayTestComplete(self):
+        print("Test completed")
         
-        def addMessage(self, msg):
-            print(msg)
+    def addMessage(self, msg):
+        print(msg)
         
-        def update(self, t, pos, data):
-            print(str(t) + ", " + str(pos) + ", " + str(data) + "\n")
+    def update(self, t, pos, data):
+        print(str(t) + ", " + str(pos) + ", " + str(data) + "\n")
 
 
 class SampleDB:
@@ -83,6 +83,10 @@ class SampleDB:
     def sendData(self, data):
         self.data = data
         print("data sent")
+        return
+
+    def appendData(self, **kwargs):
+        print("adding to buffer")
         return
     
     def uploadToDatabase(self, label):
@@ -156,7 +160,7 @@ class SampleMotor:
 
 def mechSysInit(port, devMode=False):
     if not devMode:
-        motor = SMC100(123, port, silent=False)
+        motor = SMC100(1, port, silent=False)
         # motor.home()
     else:
         motor = SampleMotor()
