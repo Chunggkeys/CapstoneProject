@@ -1,11 +1,11 @@
-from manager import Manager
-from sysInit import *
-
 import threading
 import time
 import sys
 
+from sysInit import *
 from controller import Controller
+from calibration import Calibration
+from manager import Manager
 
 # Port used on the Rapberry Pi, where the driver is connected to
 PORT = "/dev/ttyUSB0"
@@ -93,8 +93,11 @@ while 1:
 
         elif state == CALIBRATING_STATE:
             # Calibration using statistical analysis, t-test
-            data = hw.read_R()
-            control.setCalibrationResistances(data)
+            c = Calibration()
+            while not c.getCalibrationState():
+                data = hw.read_R()
+                c.insertCalibrationData(data)
+                control.setCalibrated(c.getCalibrationState())
 
         elif state == FAILED_STATE:
             # Controller errors obtained and gui displays error message

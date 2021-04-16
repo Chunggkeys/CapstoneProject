@@ -111,9 +111,6 @@ class Controller:
         self.totalCycles = totalCycles        
         # self.totalDisplacement = self.calibrationValue + displacement
         self.displacement = displacement
-
-    def setCalibrationResistances(self, resistanceArr):
-        self.calibrationResistances = resistanceArr
     
     def getErrorBuffer(self):
         return self.errorBuffer
