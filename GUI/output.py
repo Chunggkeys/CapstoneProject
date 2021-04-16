@@ -1,6 +1,7 @@
 import numpy as np
 from .constants import *
 
+
 class Output():
     def __init__(self):
         self.x = []
@@ -9,7 +10,7 @@ class Output():
         self.dataResist1 = []
         self.dataResist2 = []
         self.dataResist3 = []
-        self.ptr = 1
+        self.ptr = 0
 
         self.error = ''
         self.messageBuffer = []
@@ -24,22 +25,17 @@ class Output():
         self.dataResist0 = np.empty(DATA_BUFF_SIZE)
         self.dataResist1 = np.empty(DATA_BUFF_SIZE)
         self.dataResist2 = np.empty(DATA_BUFF_SIZE)
+        
         self.dataResist3 = np.empty(DATA_BUFF_SIZE)
-
-        self.dataPos[0] = 0
-        self.dataResist0[0] = 0
-        self.dataResist1[0] = 0
-        self.dataResist2[0] = 0
-        self.dataResist3[0] = 0
 
     def reset(self):
         self.ptr = 1
         self.initializeData()
     
     def update(self, x, motorPos, resistance):
+        # if the amount of data is less than the data buffer size
         if self.ptr < DATA_BUFF_SIZE:
             self.dataPos[self.ptr] = motorPos
-
             self.dataResist0[self.ptr] = resistance[0]
             self.dataResist1[self.ptr] = resistance[1]
             self.dataResist2[self.ptr] = resistance[2]
@@ -48,6 +44,8 @@ class Output():
             self.x[self.ptr] = x
 
             self.ptr +=1 
+
+        # if the amount of data has reached the data buffer size, start removing earliest data
         else:
             self.dataPos[:-1] = self.dataPos[1:]
             self.dataPos[-1] = motorPos
