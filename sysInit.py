@@ -1,10 +1,12 @@
 import time
 
 ####### Uncomment when flipping devMode to False, comment when flipping to True
-from pySMC100.smc100 import * 
-# from GUI.control import *
-# from GUI.output import *
-# from GUI.gui import initGUI
+# from pySMC100.smc100 import * 
+# from multiprocessing import Process
+import threading
+from GUI.control import *
+from GUI.output import *
+from GUI.gui import initGUI
 # from ioInterface import *
 # from database.data import Data, Common
 # from measurementModule import HW
@@ -28,14 +30,14 @@ class SampleGUIControl:
         time.sleep(1)
         print("Grabbed data from display")
         self.data = { 
-            'length' : 10,
-            'thick' : 2,
-            'defn' : 3,
-            'ptt1' : 25,
-            'ptt2' : 30,
-            'ptt3' : 35,
-            'ptt4' : 40,
-            'nCycles' : 5 
+            'l' : 10,
+            't' : 2,
+            'd' : 3,
+            'p1' : 25,
+            'p2' : 30,
+            'p3' : 35,
+            'p4' : 40,
+            'n' : 5 
         }
         return self.data
     
@@ -91,6 +93,11 @@ class SampleDB:
     
     def uploadToDatabase(self, label):
         print("Uploading to database")
+        return
+    
+    def appendData(self, **kwargs):
+        print("adding data to buffer")
+        return
 
 class SampleDBKeys:
     key_time = "Time"
@@ -146,7 +153,7 @@ class SampleMotor:
         
     def move_relative_mm(self, dist_mm, waitStop=True):
         time.sleep(1)
-        print("Moving stage downwards to ", dist_mm)
+        print("Moving stage to ", dist_mm)
     
     def get_position_mm(self):
         return 4
@@ -176,7 +183,12 @@ def guiInit(devMode=False):
     else:
         guiOutput = Output()
         guiControl = Control()
-        initGUI(guiControl, guiOutput)
+        t = threading.Thread(target=initGUI, args=(guiControl,guiOutput,))
+        t.start()
+        # p = Process(target=initGUI, args=(guiControl,guiOutput,))
+        # p.start()
+        # p.join()
+        # initGUI(guiControl, guiOutput)
         
     return guiOutput, guiControl
 
