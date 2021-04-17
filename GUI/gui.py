@@ -119,7 +119,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 self.curveResist.setData(x[:ptr], dataResist[self.selected_res][:ptr])
             else:
                 self.curvePos.setData(x, dataPos)
-                self.curveResist0.setData(x, dataResist[self.selected_res])
+                self.curveResist.setData(x, dataResist[self.selected_res])
         
     def clearInputs(self):
         self.input_length.clear()

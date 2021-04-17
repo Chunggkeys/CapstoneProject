@@ -173,6 +173,9 @@ class HW:
         buff = [0,0,0,0,0,0,0,0,0];
         #buff=array('b',[0,0,0,0,0,0,0,0,0])
         #buff = [];
+        while GPIO.input(DRDY_PIN[x]) == True:
+            time.sleep(0.001)
+
         GPIO.output(CS_PIN[x], False)
         #time.sleep(0.001)               # sleep for 0.1 seconds
         #for i in range(0,9):
@@ -214,7 +217,7 @@ class HW:
     def read_R(self, Pot):
         resistance = [0, 0, 0, 0]
         voltage_array = [0, 0, 0, 0]
-
+        pot = [680,680,680,680]
 
         for x in range(4):
             voltage_array[x] = self.Read_Data(x);
@@ -238,14 +241,13 @@ class HW:
 
 
 # Test code
-hw = HW()
-hw.initialisation1()
-hw.initialisation2()
+# hw = HW()
+# hw.initialisation1()
+# hw.initialisation2()
 
-while True:
+# while True:
 
-    x = hw.read_R([360,0,0,0]);
-    t = hw.read_T()
-    print(x, "mV", t, "C" )
-    time.sleep(0.5)
+#     x = hw.read_R([680,680,680,680]);
+#     t = hw.read_T()
+#     print(x, "mV", t, "C" )
 
