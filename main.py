@@ -12,7 +12,7 @@ PORT = "/dev/ttyUSB0"
 
 # Developer mode, flip this flag to false to run with real components
 # Flip to false to use placeholder classes. 
-devMode = True
+devMode = False
 
 IDLE_STATE                  = 0
 HOMING_STATE                = 1
@@ -49,8 +49,8 @@ while 1:
         # Loop executes until user input is submitted
         inputData = guiControl.getDataBuffer()
         if inputData is not None:
-            totalCycles = inputData['nCycles']
-            displacement = inputData['defn']
+            totalCycles = inputData['n']
+            displacement = inputData['d']
 
             guiControl.clearDataBuffer()
             curState = CALIBRATING_STATE
