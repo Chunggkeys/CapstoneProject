@@ -102,7 +102,7 @@ while 1:
         elif state == FAILED_STATE:
             # Controller errors obtained and gui displays error message
             controllerErrors = control.getErrorBuffer()
-            guiOutput.addMessage("Test has failed")
+            guiOutput.addError("Test has failed")
             break
 
         elif state == TEST_COMPLETE_STATE:
