@@ -43,6 +43,7 @@ dbData = {}
 sys.stdout = open('params.log', 'w')
 
 while 1:
+    print("Awaiting test start")
     while 1:
 
         # Loop executes until user input is submitted
