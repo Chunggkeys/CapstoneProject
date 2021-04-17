@@ -1,79 +1,84 @@
-from manager import Manager
-from sysInit import *
-# from multiprocessing import Process, Queue
+import threading
 import time
-# import functions
+import sys
 
-# import gui
-# import hardware functions
-# import db
+from sysInit import *
+from controller import Controller
+from calibration import Calibration
+from manager import Manager
 
-PORT = "/dev/serial0"
+# Port used on the Rapberry Pi, where the driver is connected to
+PORT = "/dev/ttyUSB0"
+
+# Developer mode, flip this flag to false to run with real components
+# Flip to false to use placeholder classes. 
 devMode = True
 
-IDLE_STATE = 0
-HOMING_STATE = 1
-CALIBRATING_STATE = 2
-MOVING_DOWN_STATE = 3
-MOVING_UP_STATE = 4 
-FAULTED_STATE = 5
-TEST_COMPLETE_STATE = 6
-FAILED_STATE = -1
+IDLE_STATE                  = 0
+HOMING_STATE                = 1
+CALIBRATING_STATE           = 2
+MOVING_DOWN_STATE           = 3
+MOVING_UP_STATE             = 4 
+FAULTED_STATE               = 5
+TEST_COMPLETE_STATE         = 6
+FAILED_STATE                = -1
+
 curCycle = 1
 totalCycles = 0; displacement = 0
-calibrationDisplacement = 0
+totalDisplacement = 0
 
 # measurementData = Queue()
-motor = mechSysInit(PORT, devMode)
-guiOutput, guiControl = guiInit()
+motor = mechSysInit(PORT, False)
+guiOutput, guiControl = guiInit(devMode)
 db, dbKeys = dbInit(devMode)
 hw = hwInit(devMode)
+control = Controller(motor)
 
 curState = IDLE_STATE
 startPressed = False
 dbData = {}
 
+# Set standard out to print to params.log file
+# All print statements will now print to this log
+sys.stdout = open('params.log', 'w')
+
 while 1:
     print("Awaiting test start")
     while 1:
+
+        # Loop executes until user input is submitted
         inputData = guiControl.getDataBuffer()
         if inputData is not None:
-            totalCycles = inputData['n']
-            displacement = inputData['d']
+            totalCycles = inputData['nCycles']
+            displacement = inputData['defn']
+
             guiControl.clearDataBuffer()
-            inputDataBuffer = {}
-            curState = HOMING_STATE
+            curState = CALIBRATING_STATE
             break
-    #
+    
+    # totalDisplacement = displacement + calibrationDisplacement
+    control.setParams(totalCycles, displacement)
 
-    # Tentatively here, might be removed
-    # while not startPressed:
-    #     startPressed = guiControl.waitStart()
-    #     curState = HOMING_STATE
-    # 
+    # Initialize SPI communication to allow temperature and resistance
+    # measurement
+    hw.initialisation1()
+    hw.initialisation2()
 
-    # At this point, gui will have user input already
-    # This loop controls motor 
-    while curState >= HOMING_STATE and curState <= MOVING_UP_STATE:
-        if curState == HOMING_STATE:
-            motor.home()
-            print(curState)
-            curState += 1
-        elif curState == CALIBRATING_STATE:
-            # Calibrate motor here
+    # Start controller on another thread
+    t = threading.Thread(target=control.run, args=())
+    t.start()
+    
+    while 1:
+        state = control.getCurState()
+        pos = control.getPos()
 
-            print(curState)
-            curState += 1
-        elif curState == MOVING_DOWN_STATE:
-            # Motor displaces downward
-            data = hw.read_R(devMode)
-            temp = hw.read_T(devMode)
-            
-            print(curState)
-            # Change to something better
+        if state == MOVING_DOWN_STATE or state == MOVING_UP_STATE:
+            # As actuator is moving up and down, resistance data and temperature
+            # are being read and stored into hash
+            data = hw.read_R()
+            temp = hw.read_T()
+
             t = time.time()
-            pos  = motor.get_position_mm()
-            guiOutput.update(t, pos, data)
 
             dbData[dbKeys.key_time] = t
             dbData[dbKeys.key_mpos] = pos
@@ -84,31 +89,34 @@ while 1:
             
             db.appendData(**dbData)
 
-            # Need to include error handling
-            if curCycle <= totalCycles:
-                motor.move_relative_mm(displacement)
-                curState += 1; curCycle += 1
-            else:
-                curState = TEST_COMPLETE_STATE
+            # Update live graph
+            guiOutput.update(t, pos, data)
 
-        elif curState == MOVING_UP_STATE:
-            # Motor displaces upward
-            motor.move_relative_mm(-displacement)
-            print(curState)
-            curState -= 1
-        elif curState == FAULTED_STATE:
-            # Retry most recent action?
-            print(curState)
-        elif curState == TEST_COMPLETE_STATE: 
-            guiOutput.addMessage("Test Complete!")
-            motor.home()
+        elif state == CALIBRATING_STATE:
+            # Calibration using statistical analysis, t-test
+            c = Calibration()
+            while not c.getCalibrationState():
+                data = hw.read_R()
+                c.insertCalibrationData(data)
+                control.setCalibrated(c.getCalibrationState())
+
+        elif state == FAILED_STATE:
+            # Controller errors obtained and gui displays error message
+            controllerErrors = control.getErrorBuffer()
+            guiOutput.addError("Test has failed")
             break
-        elif curState == FAILED_STATE:
-            print(curState)    
-            guiOutput.setError(msg)
-            curState = IDLE_STATE
 
+        elif state == TEST_COMPLETE_STATE:
+            # Controller completes test, gui displays message
+            guiOutput.addMessage("Test Complete!")
+            break
+
+    hw.close()
+
+    # Data uploaded to database here
     db.uploadToDatabase("sample,label,here")
+
+    # Flags reset for the next test
     startPressed = False; inputData = None
     curState = IDLE_STATE; curCycle = 1
 
