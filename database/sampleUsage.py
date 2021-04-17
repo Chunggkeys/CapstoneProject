@@ -26,7 +26,7 @@ count = 0
 while running:
     # time.sleep(2)
     loop_results = {}
-
+    print(count)
     loop_results[Common.key_time] = time.time()
     
     loop_results = getAllResistances(loop_results)
@@ -39,5 +39,6 @@ while running:
 
     db.appendData(**loop_results)
     count += 1
-    
-db.saveToCSV()
+
+print("Saving to DB")
+db.uploadToDatabase("TestLabel")
