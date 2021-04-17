@@ -100,11 +100,14 @@ class MainWindow(QtWidgets.QMainWindow):
     def checkEvents(self):
         if not self.messageBox.isVisible():
             message = self.output.readMessages()
+            error = self.output.readErrors()
             if message:
                 self.displayMessage(message, 'info')
+            if error:
+                self.displayMessage(error, 'error')
 
     def update(self):
-        error = self.output.getError()
+        error = self.output.readErrors()
         if error:
             self.timer.stop()
             self.displayMessage(error, 'error')

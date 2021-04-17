@@ -12,7 +12,7 @@ class Output():
         self.dataResist3 = []
         self.ptr = 0
 
-        self.error = ''
+        self.errorBuffer = []
         self.messageBuffer = []
 
         self.initializeData()
@@ -71,11 +71,13 @@ class Output():
         resistance = [self.dataResist0, self.dataResist1, self.dataResist2, self.dataResist3]
         return [self.ptr, self.x, self.dataPos, resistance]
     
-    def setError(self, error):
-        self.error = error
+    def addError(self, error):
+        self.errorBuffer.append(error)
     
-    def getError(self):
-        return self.error
+    def readErrors(self):
+        if self.errorBuffer:
+            return self.errorBuffer.pop(0)
+        return None
 
     def addMessage(self, message):
         self.messageBuffer.append(message)
