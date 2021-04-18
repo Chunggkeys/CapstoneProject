@@ -71,6 +71,8 @@ class Calibration:
     
     def _updateT(self, data):
         index = 0
+        # print(self.allResistanceStats["r2"]["mean"], self.allResistanceStats["r2"]['stDev'])
+
         for r in self.allResistors:
             val = data[index]
             curMean = self.allResistanceStats[r]["mean"]
@@ -93,13 +95,20 @@ class Calibration:
             if self.numData > 2:
                 curVar = ((self.numData-2) * curVar + (val-curMean) * (val-prevMean)) / (self.numData-1)
                 self.allResistanceStats[r]["var"] = curVar
-                self.allResistanceStats[r]["stDev"] = sqrt(curVar)
+                stDev = sqrt(curVar)
+                self.allResistanceStats[r]["stDev"] = stDev
+
+                if stDev != 0:
+                    t = (val - curMean) / stDev
+                    # if r == "r2":
+                        # print("t: ", t, "val: ", val)
+                    if t >= 2:
+                        self.isCalibrated = True; break
         
             index += 1
         
             # Toggles isCalibrated flag once standard deviation is greater than, equal to 2
-            if self.allResistanceStats[r]["stDev"] >= 2:
-                self.isCalibrated = True; break
+            
 
     def getData(self):
         return self.allResistanceStats

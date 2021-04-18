@@ -46,6 +46,10 @@ class MainWindow(QtWidgets.QMainWindow):
         self.btn_clear.clicked.connect(self.clearInputs)
         self.btn_start.clicked.connect(self.toggleStart)
 
+        #Initialize resistance select dropdown
+        self.select_resist.currentIndexChanged.connect(self.resGraphChanged)
+        self.selected_res = 0
+
         #set input validators
         intValidator = QtGui.QIntValidator()
         doubleValidator = QtGui.QDoubleValidator()
@@ -67,21 +71,12 @@ class MainWindow(QtWidgets.QMainWindow):
         self.graph_resist.setLabel('bottom', 'Time', 's')
         self.graph_resist.setLabel('left', 'Resistance', '\u03A9')
 
-        self.graph_resist.addLegend(offset=(1,1), colCount=4, labelTextSize='6pt')
-
         self.curvePos = self.graph_pos.plot()
-
-        pen0 = pg.mkPen(color=(255, 145, 71))
-        self.curveResist0 = self.graph_resist.plot(pen=pen0, name="Res 0")
-        pen1 = pg.mkPen(color=(131, 250, 122))
-        self.curveResist1 = self.graph_resist.plot(pen=pen1, name="Res 1")
-        pen2 = pg.mkPen(color=(121, 154, 252))
-        self.curveResist2 = self.graph_resist.plot(pen=pen2, name="Res 2")
-        pen3 = pg.mkPen(color=(232, 113, 245))
-        self.curveResist3 = self.graph_resist.plot(pen=pen3, name="Res 3")
+        self.curveResist = self.graph_resist.plot()
 
         #initialize dialog box
         self.messageBox = QtWidgets.QMessageBox()
+        self.confirmDialog = QtWidgets.QMessageBox()
 
         #Initialize timer
         self.timer = pg.QtCore.QTimer()
@@ -92,31 +87,39 @@ class MainWindow(QtWidgets.QMainWindow):
         self.eventTimer.timeout.connect(self.checkEvents)
         self.eventTimer.start(50)
     
+    # when enter key is pressed
+    def keyPressEvent(self, event):
+        if event.key() == pg.QtCore.Qt.Key_Return:
+            if not self.btn_start.isChecked():
+                self.btn_start.toggle()
+                self.toggleStart()
+        else:
+            super().keyPressEvent(event) 
+    
+    # check if there are any messages from the system
     def checkEvents(self):
         if not self.messageBox.isVisible():
             message = self.output.readMessages()
+            error = self.output.readErrors()
             if message:
                 self.displayMessage(message, 'info')
+            if error:
+                self.displayMessage(error, 'error')
 
     def update(self):
-        error = self.output.getError()
+        error = self.output.readErrors()
         if error:
             self.timer.stop()
             self.displayMessage(error, 'error')
         else:
+            # update graph
             [ptr, x, dataPos, dataResist] = self.output.getData()
             if (ptr < DATA_BUFF_SIZE):
                 self.curvePos.setData(x[:ptr], dataPos[:ptr])
-                self.curveResist0.setData(x[:ptr], dataResist[0][:ptr])
-                self.curveResist1.setData(x[:ptr], dataResist[1][:ptr])
-                self.curveResist2.setData(x[:ptr], dataResist[2][:ptr])
-                self.curveResist3.setData(x[:ptr], dataResist[3][:ptr])
+                self.curveResist.setData(x[:ptr], dataResist[self.selected_res][:ptr])
             else:
                 self.curvePos.setData(x, dataPos)
-                self.curveResist0.setData(x, dataResist[0])
-                self.curveResist1.setData(x, dataResist[1])
-                self.curveResist2.setData(x, dataResist[2])
-                self.curveResist3.setData(x, dataResist[3])
+                self.curveResist.setData(x, dataResist[self.selected_res])
         
     def clearInputs(self):
         self.input_length.clear()
@@ -128,6 +131,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.input_ptt3.clear()
         self.input_ptt4.clear()
 
+    # convert inputs to numbers and check if any inputs are empty
     def parseInputs(self):
         l = self.input_length.text()
         t = self.input_thick.text()
@@ -156,19 +160,26 @@ class MainWindow(QtWidgets.QMainWindow):
 
 
     def toggleStart(self):
+        # if operation has started
         if not self.btn_start.isChecked():
-            self.control.setStopPressed(False)
-            self.timer.stop()
-            self.btn_start.setText('Start')
+            if self.confirmQuestion('Are you sure you want to stop operation?'):
+                self.control.setStopPressed(False)
+                self.timer.stop()
+                self.btn_start.setText('Start')
 
-            self.input_length.setReadOnly(False)
-            self.input_thick.setReadOnly(False)
-            self.input_def.setReadOnly(False)
-            self.input_nCycles.setReadOnly(False)
-            self.input_ptt1.setReadOnly(False)
-            self.input_ptt2.setReadOnly(False)
-            self.input_ptt3.setReadOnly(False)
-            self.input_ptt4.setReadOnly(False)
+                self.input_length.setReadOnly(False)
+                self.input_thick.setReadOnly(False)
+                self.input_def.setReadOnly(False)
+                self.input_nCycles.setReadOnly(False)
+                self.input_ptt1.setReadOnly(False)
+                self.input_ptt2.setReadOnly(False)
+                self.input_ptt3.setReadOnly(False)
+                self.input_ptt4.setReadOnly(False)
+                self.btn_clear.setEnabled(True)
+            else:
+                self.btn_start.toggle()
+
+        #if operation has not started
         else:
             params = self.parseInputs()
             if params:
@@ -189,12 +200,17 @@ class MainWindow(QtWidgets.QMainWindow):
                     self.input_ptt2.setReadOnly(True)
                     self.input_ptt3.setReadOnly(True)
                     self.input_ptt4.setReadOnly(True)
-                else: 
+                    self.btn_clear.setEnabled(False)
+                else:
                     errorMessage = ''
                     for p in invalid:
                         errorMessage = errorMessage + paramMappings[p] + ' must be positive and less than ' + maxParamMappings[p] + '\n'
                     self.displayMessage(errorMessage, 'warning')
-
+                    self.btn_start.toggle()
+            else:
+                self.btn_start.toggle()
+                    
+    # message dialog
     def displayMessage(self, message, type):
         msgType = QtWidgets.QMessageBox.Information
         if type == 'error':
@@ -206,6 +222,15 @@ class MainWindow(QtWidgets.QMainWindow):
         self.messageBox.setText(message)
         self.messageBox.setWindowTitle(type)
         self.messageBox.exec()
+
+    # confirm dialog
+    def confirmQuestion(self, message):
+        res = self.confirmDialog.question(self, '', message, self.confirmDialog.Yes | self.confirmDialog.No)
+        return (res == self.confirmDialog.Yes)
+
+    # change the displayed resistance
+    def resGraphChanged(self, i):
+        self.selected_res = i
 
 def initGUI(control, output):
     app = QtWidgets.QApplication(sys.argv)

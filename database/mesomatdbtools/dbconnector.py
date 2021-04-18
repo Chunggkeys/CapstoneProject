@@ -14,7 +14,7 @@ tables and return results in an easy to parse format.
 """
 
 
-from mesomatdbtools.exceptions import AuthenticationError, TableNotFoundError, ColumnNotFoundError, InvalidParameterError, InvalidIdError
+from .exceptions import AuthenticationError, TableNotFoundError, ColumnNotFoundError, InvalidParameterError, InvalidIdError
 
 import mysql.connector as mysql
 from mysql.connector import errorcode

@@ -25,13 +25,14 @@ FAILED_STATE                = -1
 
 curCycle = 1
 totalCycles = 0; displacement = 0
+pot = []
 totalDisplacement = 0
 
 # measurementData = Queue()
 motor = mechSysInit(PORT, False)
-guiOutput, guiControl = guiInit(devMode)
+guiOutput, guiControl = guiInit(False)
 db, dbKeys = dbInit(devMode)
-hw = hwInit(devMode)
+hw = hwInit(False)
 control = Controller(motor)
 
 curState = IDLE_STATE
@@ -40,7 +41,7 @@ dbData = {}
 
 # Set standard out to print to params.log file
 # All print statements will now print to this log
-sys.stdout = open('params.log', 'w')
+# sys.stdout = open('params.log', 'w')
 
 while 1:
     print("Awaiting test start")
@@ -49,8 +50,11 @@ while 1:
         # Loop executes until user input is submitted
         inputData = guiControl.getDataBuffer()
         if inputData is not None:
-            totalCycles = inputData['nCycles']
-            displacement = inputData['defn']
+            totalCycles = inputData['n']
+            displacement = inputData['d']
+            pot = [inputData['p1'], inputData['p2'], inputData['p3'], inputData['p4']]
+            print(pot)
+            time.sleep(5)
 
             guiControl.clearDataBuffer()
             curState = CALIBRATING_STATE
@@ -67,15 +71,16 @@ while 1:
     # Start controller on another thread
     t = threading.Thread(target=control.run, args=())
     t.start()
-    
+
     while 1:
         state = control.getCurState()
         pos = control.getPos()
 
         if state == MOVING_DOWN_STATE or state == MOVING_UP_STATE:
+            # print("MOVING UP OR DOWN: ", data, temp)
             # As actuator is moving up and down, resistance data and temperature
             # are being read and stored into hash
-            data = hw.read_R()
+            data = hw.read_R(pot)
             temp = hw.read_T()
 
             t = time.time()
@@ -92,11 +97,16 @@ while 1:
             # Update live graph
             guiOutput.update(t, pos, data)
 
+        elif state == HOMING_STATE:
+            print("HOMING STATE")
+
         elif state == CALIBRATING_STATE:
             # Calibration using statistical analysis, t-test
+            isCalibrated = False
             c = Calibration()
             while not c.getCalibrationState():
-                data = hw.read_R()
+                data = hw.read_R(pot)
+                # print("CALIBRATING WITH: ", data)
                 c.insertCalibrationData(data)
                 control.setCalibrated(c.getCalibrationState())
 

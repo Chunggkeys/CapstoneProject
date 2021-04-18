@@ -28,12 +28,15 @@ class Controller:
         self.curTime = 0
 
         self.errorBuffer = []
+        self.pos = self.motor.get_position_mm()
+
+        self.minPos = 13
 
     def getPos(self):
         return self.pos
 
     def run(self):
-        self.curState = self.calibratingState
+        self.curState = self.homingState
         self.curCycle = 1
 
         while 1:
@@ -44,9 +47,9 @@ class Controller:
             self.status = self.motor.get_status()[1]            
             self.pos = self.motor.get_position_mm()
             
-            print("Position: " + str(self.pos))
-            print("Status: " + str(self.status))
-            print("Cycle: " + str(self.curCycle))
+            # print("Position: " + str(self.pos))
+            # print("Status: " + str(self.status))
+            # print("Cycle: " + str(self.curCycle))
 
             if self.status == '0' or self.status == '10' or self.status == '11':
                 self.errorBuffer.append("Controller error code: " + self.status + "\n")
@@ -54,7 +57,7 @@ class Controller:
                 
 
             if self.curState == self.calibratingState:
-
+                # print("CALIBRATING STATE")
                 self.motor.move_absolute_mm(FULL_DISPLACEMENT, waitStop=False)
                 
                 while not self.isCalibrated:
@@ -67,10 +70,18 @@ class Controller:
                 self.totalDisplacement = self.calibrationValue + self.displacement
 
                 # Log parameterized values
-                print("Calibrated displacement: " + self.calibrationValue + "\nTotal displacement: " + self.totalDisplacement + "\n\n")
+                # print("Calibrated displacement: " + self.calibrationValue + "\nTotal displacement: " + self.totalDisplacement + "\n\n")
                 self.curState += 1
+            
+            if self.curState == self.homingState:
+                # print("HOMING STATE")
+                self.motor.move_absolute_mm(self.minPos, waitStop=False)
+
+                if self.pos <= self.minPos + POS_THRESHOLD:
+                    self.curState = self.calibratingState
         
             elif self.curState == self.movingDownState:
+                # print("MOVING DOWN")
                 self.motor.move_absolute_mm(self.totalDisplacement, waitStop=False)
 
                 if self.pos >= self.totalDisplacement-POS_THRESHOLD:
@@ -78,6 +89,7 @@ class Controller:
                     self.curState += 1
 
             elif self.curState == self.movingUpState:
+                # print("MOVING UP")
                 self.motor.move_absolute_mm(self.calibrationValue, waitStop=False)
 
                 if self.pos <= self.calibrationValue + POS_THRESHOLD:   
@@ -102,8 +114,10 @@ class Controller:
             elif self.curState == self.testCompleteState:
                 break
 
-            print("Sleep: " + str(milliseconds()-self.curTime))
-            sleep(( 300 - (milliseconds() - self.curTime )) / 1000)
+
+            t = ( 300 - (milliseconds() - self.curTime )) / 1000
+            # print("Sleep: " + str(milliseconds()-self.curTime))
+            sleep(0 if t < 0 else t)
 
         return
 
