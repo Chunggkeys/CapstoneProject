@@ -28,8 +28,8 @@ totalCycles = 0; displacement = 0
 totalDisplacement = 0
 
 # measurementData = Queue()
-motor = mechSysInit(PORT, False)
-guiOutput, guiControl = guiInit(devMode)
+motor = mechSysInit(PORT, devMode)
+guiOutput, guiControl = guiInit(False)
 db, dbKeys = dbInit(devMode)
 hw = hwInit(devMode)
 control = Controller(motor)
