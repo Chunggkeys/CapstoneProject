@@ -1,7 +1,7 @@
 import time
 
 ####### Uncomment when flipping devMode to False, comment when flipping to True
-# from pySMC100.smc100 import * 
+from pySMC100.smc100 import * 
 # from multiprocessing import Process
 import threading
 from GUI.control import *
@@ -9,7 +9,7 @@ from GUI.output import *
 from GUI.gui import initGUI
 # from ioInterface import *
 # from database.data import Data, Common
-# from measurementModule import HW
+from measurementModule import HW
 ########
 
 ## Placeholder classes 
@@ -33,11 +33,11 @@ class SampleGUIControl:
             'l' : 10,
             't' : 2,
             'd' : 3,
-            'p1' : 25,
-            'p2' : 30,
-            'p3' : 35,
-            'p4' : 40,
-            'n' : 5 
+            'p1' : 680,
+            'p2' : 680,
+            'p3' : 680,
+            'p4' : 680,
+            'n' : 2 
         }
         return self.data
     
@@ -121,7 +121,7 @@ class SampleHW:
     def msg(self):
         return self.msg
     
-    def read_R(self):
+    def read_R(self, pot):
         return [20,2,20,20]
 
     def read_T(self):

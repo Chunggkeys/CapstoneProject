@@ -94,7 +94,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 self.btn_start.toggle()
                 self.toggleStart()
         else:
-            super().keyPressEvent(qKeyEvent) 
+            super().keyPressEvent(event) 
     
     # check if there are any messages from the system
     def checkEvents(self):
@@ -119,7 +119,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 self.curveResist.setData(x[:ptr], dataResist[self.selected_res][:ptr])
             else:
                 self.curvePos.setData(x, dataPos)
-                self.curveResist0.setData(x, dataResist[self.selected_res])
+                self.curveResist.setData(x, dataResist[self.selected_res])
         
     def clearInputs(self):
         self.input_length.clear()
