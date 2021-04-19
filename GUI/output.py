@@ -42,7 +42,7 @@ class Output():
             self.dataResist3[self.ptr] = resistance[3]
 
             self.x[self.ptr] = x
-
+            #print(x, motorPos, resistance)
             self.ptr +=1 
 
         # if the amount of data has reached the data buffer size, start removing earliest data

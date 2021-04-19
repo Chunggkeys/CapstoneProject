@@ -61,7 +61,9 @@ while 1:
             break
     
     # totalDisplacement = displacement + calibrationDisplacement
+
     control.setParams(totalCycles, displacement)
+
 
     # Initialize SPI communication to allow temperature and resistance
     # measurement
@@ -98,7 +100,8 @@ while 1:
             guiOutput.update(t, pos, data)
 
         elif state == HOMING_STATE:
-            print("HOMING STATE")
+            #print("HOMING STATE")
+            pass
 
         elif state == CALIBRATING_STATE:
             # Calibration using statistical analysis, t-test
