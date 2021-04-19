@@ -43,11 +43,13 @@ class ResistanceSet:
 
 
     def clear(self):
-        self.A = 0
-        self.B = 0
-        self.stderr = 0
-        self.time = 0
-        self.isCalibrated = False
+        self.__mean = 0.0
+        self.__prev_mean = 0.0
+        self.__var = 0.0 
+        self.__std = 0.0
+        self.__n = 0
+        self.__count = 0
+        self.__buf.clear()
 
 class Calibration:
     def __init__(self):
