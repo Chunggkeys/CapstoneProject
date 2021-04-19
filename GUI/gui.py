@@ -2,7 +2,7 @@ from PyQt5 import QtWidgets, uic, QtGui
 from pyqtgraph import PlotWidget
 import pyqtgraph as pg
 import sys
-from .constants import *
+from constants import *
 
 paramMappings = {
     'l': 'Length',
@@ -163,7 +163,7 @@ class MainWindow(QtWidgets.QMainWindow):
         # if operation has started
         if not self.btn_start.isChecked():
             if self.confirmQuestion('Are you sure you want to stop operation?'):
-                self.control.setStopPressed(False)
+                self.control.setStopPressed(True)
                 self.timer.stop()
                 self.btn_start.setText('Start')
 

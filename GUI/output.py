@@ -1,5 +1,5 @@
 import numpy as np
-from .constants import *
+from constants import *
 
 
 class Output():
@@ -29,7 +29,7 @@ class Output():
         self.dataResist3 = np.empty(DATA_BUFF_SIZE)
 
     def reset(self):
-        self.ptr = 1
+        self.ptr = 0
         self.initializeData()
     
     def update(self, x, motorPos, resistance):
