@@ -1,4 +1,4 @@
-from constants import *
+from .constants import *
 
 class Control:
     def __init__(self):

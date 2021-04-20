@@ -131,9 +131,9 @@ class Controller:
                 break
 
 
-            t = ( 300 - (milliseconds() - self.curTime )) / 1000
+            # t = ( 300 - (milliseconds() - self.curTime )) / 1000
             # print("Sleep: " + str(milliseconds()-self.curTime))
-            sleep(0 if t < 0 else t)
+            # sleep(0 if t < 0 else t)
 
         return
 
@@ -153,3 +153,7 @@ class Controller:
 
     def setCalibrated(self, isCalibrated):
         self.isCalibrated = isCalibrated
+
+    def kill(self):
+        self.motor.stop()
+        self.motor.move_absolute_mm(self.minPos)

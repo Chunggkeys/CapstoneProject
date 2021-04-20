@@ -37,6 +37,8 @@ class ResistanceSet:
 
             if (__n > 2 and (__val - self.__mean) / self.__std > 2):
                 self.__count += 1
+            else:
+                self.__count = 0
             
             if (self.__count > 5):
                 self.isCalibrated = True
@@ -81,8 +83,8 @@ class Calibration:
     def resetCalibrationData(self):
 
         for r in self.allResistors:
-            r.clear()
-
+           # r.clear()
+            pass
         self.__numData = 0
 
 
