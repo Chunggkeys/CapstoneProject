@@ -71,6 +71,9 @@ class MainWindow(QtWidgets.QMainWindow):
         self.graph_resist.setLabel('bottom', 'Time', 's')
         self.graph_resist.setLabel('left', 'Resistance', '\u03A9')
 
+        self.graph_pos.setMouseEnabled(x=False, y=False)
+        self.graph_resist.setMouseEnabled(x=False, y=False)
+
         self.curvePos = self.graph_pos.plot()
         self.curveResist = self.graph_resist.plot()
 
