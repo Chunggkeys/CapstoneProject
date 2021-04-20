@@ -1,7 +1,6 @@
 from math import sqrt
 from dataclasses import dataclass, field
 
-
 CALIBRATION_GAP = 10
 
 @dataclass
