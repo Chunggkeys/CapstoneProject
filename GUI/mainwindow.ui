@@ -36,16 +36,6 @@
       </rect>
      </property>
     </widget>
-    <widget class="QLineEdit" name="input_def">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>120</y>
-       <width>131</width>
-       <height>41</height>
-      </rect>
-     </property>
-    </widget>
     <widget class="QLineEdit" name="input_thick">
      <property name="geometry">
       <rect>
@@ -95,10 +85,10 @@
       <string>Displacement (mm)</string>
      </property>
     </widget>
-    <widget class="QLineEdit" name="input_nCycles">
+    <widget class="QLineEdit" name="input_def">
      <property name="geometry">
       <rect>
-       <x>170</x>
+       <x>10</x>
        <y>120</y>
        <width>131</width>
        <height>41</height>
@@ -116,6 +106,16 @@
      </property>
      <property name="text">
       <string>Number of Cycles</string>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="input_nCycles">
+     <property name="geometry">
+      <rect>
+       <x>170</x>
+       <y>120</y>
+       <width>131</width>
+       <height>41</height>
+      </rect>
      </property>
     </widget>
    </widget>
@@ -224,19 +224,6 @@
      </property>
     </widget>
    </widget>
-   <widget class="QPushButton" name="btn_clear">
-    <property name="geometry">
-     <rect>
-      <x>180</x>
-      <y>390</y>
-      <width>141</width>
-      <height>51</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Clear</string>
-    </property>
-   </widget>
    <widget class="QPushButton" name="btn_start">
     <property name="geometry">
      <rect>
@@ -251,6 +238,22 @@
     </property>
     <property name="checkable">
      <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="btn_clear">
+    <property name="geometry">
+     <rect>
+      <x>180</x>
+      <y>390</y>
+      <width>141</width>
+      <height>51</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Clear</string>
+    </property>
+    <property name="checkable">
+     <bool>false</bool>
     </property>
    </widget>
    <widget class="PlotWidget" name="graph_pos" native="true">
