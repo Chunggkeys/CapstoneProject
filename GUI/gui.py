@@ -47,6 +47,7 @@ class MainWindow(QtWidgets.QMainWindow):
         #Initialize button behaviour
         self.btn_clear.clicked.connect(self.clearInputs)
         self.btn_start.clicked.connect(self.toggleStart)
+        self.input_sLabel.setFocus()
 
         #Initialize resistance select dropdown
         self.select_resist.currentIndexChanged.connect(self.resGraphChanged)
@@ -56,6 +57,7 @@ class MainWindow(QtWidgets.QMainWindow):
         if path.exists('inputs.pckl'):
             f = open('inputs.pckl', 'rb')
             params = pickle.load(f)
+            self.input_sLabel.setText(params['label'])
             self.input_length.setText(str(params['l']))
             self.input_thick.setText(str(params['t']))
             self.input_def.setText(str(params['d']))
@@ -139,6 +141,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 self.curveResist.setData(x, dataResist[self.selected_res])
         
     def clearInputs(self):
+        self.input_sLabel.clear()
         self.input_length.clear()
         self.input_thick.clear()
         self.input_def.clear()
@@ -150,6 +153,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
     # convert inputs to numbers and check if any inputs are empty
     def parseInputs(self):
+        label = self.input_sLabel.text()
         l = self.input_length.text()
         t = self.input_thick.text()
         d = self.input_def.text()
@@ -159,12 +163,13 @@ class MainWindow(QtWidgets.QMainWindow):
         p3 = self.input_ptt3.text()
         p4 = self.input_ptt4.text()
 
-        if (not l or not t or not d or not n or not
+        if (not label or not l or not t or not d or not n or not
             p1 or not p2 or not p3 or not p4):
             self.displayMessage('Cannot leave field empty', 'warning')
             return {}
         else:
             return {
+                'label': label,
                 'l': float(l), 
                 't': float(t), 
                 'd': float(d), 
@@ -184,6 +189,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 self.timer.stop()
                 self.btn_start.setText('Start')
 
+                self.input_sLabel.setReadOnly(False)
                 self.input_length.setReadOnly(False)
                 self.input_thick.setReadOnly(False)
                 self.input_def.setReadOnly(False)
@@ -213,6 +219,7 @@ class MainWindow(QtWidgets.QMainWindow):
                     self.timer.start(50)
                     self.btn_start.setText('Stop')
 
+                    self.input_sLabel.setReadOnly(True)
                     self.input_length.setReadOnly(True)
                     self.input_thick.setReadOnly(True)
                     self.input_def.setReadOnly(True)
