@@ -2,6 +2,8 @@ from PyQt5 import QtWidgets, uic, QtGui
 from pyqtgraph import PlotWidget
 import pyqtgraph as pg
 import sys
+from os import path
+import pickle
 from .constants import *
 
 paramMappings = {
@@ -32,7 +34,6 @@ class MainWindow(QtWidgets.QMainWindow):
         super(MainWindow, self).__init__(*args, **kwargs)
 
         #Load the UI Page
-        # uic.loadUi('./GUI/mainwindow.ui', self)
         uic.loadUi('./GUI/mainwindow.ui', self)
 
         #ui title and positioning
@@ -50,6 +51,19 @@ class MainWindow(QtWidgets.QMainWindow):
         #Initialize resistance select dropdown
         self.select_resist.currentIndexChanged.connect(self.resGraphChanged)
         self.selected_res = 0
+
+        #look for any stored inputs
+        if path.exists('inputs.pckl'):
+            f = open('inputs.pckl', 'rb')
+            params = pickle.load(f)
+            self.input_length.setText(str(params['l']))
+            self.input_thick.setText(str(params['t']))
+            self.input_def.setText(str(params['d']))
+            self.input_nCycles.setText(str(params['n']))
+            self.input_ptt1.setText(str(params['p1']))
+            self.input_ptt2.setText(str(params['p2']))
+            self.input_ptt3.setText(str(params['p3']))
+            self.input_ptt4.setText(str(params['p4']))
 
         #set input validators
         intValidator = QtGui.QIntValidator()
@@ -189,6 +203,11 @@ class MainWindow(QtWidgets.QMainWindow):
                 invalid = self.control.validateParams(params)
 
                 if not invalid:
+                    #store inputs
+                    f = open('inputs.pckl', 'wb')
+                    pickle.dump(params, f)
+                    f.close()
+
                     self.control.setDataBuffer(params)
 
                     self.timer.start(50)
