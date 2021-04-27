@@ -26,7 +26,7 @@ class Controller:
 
         self.calibrationResistances = [0,0,0,0]
         self.zeros = [0,0,0,0]
-        self.curState = self.idleState
+        self.curState = self.homingState
 
         self.status=0
         self.state=0
@@ -61,14 +61,17 @@ class Controller:
         self.curState = self.homingState
         self.curCycle = 1
 
+
+        print("CONTROLLER THREAD HAS STARTED")
+
         while 1:
 
             if self._running:
 
-                self.curTime = milliseconds()  
-            
                 print(self)
 
+                self.curTime = milliseconds()  
+            
                 self.status = self.motor.get_status()[1]            
                 self.pos = self.motor.get_position_mm()
                 
@@ -132,10 +135,13 @@ class Controller:
                         self.curState = self.calibratingState
                 
                 elif self.curState == self.failedState:
-                    break
-            
+
+                        self._running = False
+
                 elif self.curState == self.testCompleteState:
-                    break
+
+                        self._running = False
+                    
 
 
             # t = ( 300 - (milliseconds() - self.curTime )) / 1000
@@ -143,6 +149,8 @@ class Controller:
             # sleep(0 if t < 0 else t)
 
         self._running = False
+
+        print("CONTROLLER THREAD HAS EXITED")
 
         return
 

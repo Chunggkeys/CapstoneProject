@@ -44,6 +44,7 @@ class ResistanceSet:
 
 
     def clear(self):
+        self.isCalibrated = False
         self.__mean = 0.0
         self.__prev_mean = 0.0
         self.__var = 0.0 
@@ -81,9 +82,11 @@ class Calibration:
 
     def resetCalibrationData(self):
 
+
+
         for r in self.allResistors:
-           # r.clear()
-            pass
+            r.clear()
+         
         self.__numData = 0
 
 

@@ -42,14 +42,16 @@ dbData = {}
 # All print statements will now print to this log
 # sys.stdout = open('params.log', 'w')
 
-try: 
+try:      
+    
+     # Start controller on another thread
+    t = threading.Thread(target=control.run, args=())
+    t.start()
 
     while 1:
         print("Awaiting test start")
 
-        # Start controller on another thread
-        t = threading.Thread(target=control.run, args=())
-        t.start()
+  
 
         while 1:
 
@@ -71,6 +73,7 @@ try:
         # totalDisplacement = displacement + calibrationDisplacement
 
         control.setParams(totalCycles, displacement)
+        control.beginTest()
 
         # pot = [680,680,680,680]
 
@@ -86,9 +89,11 @@ try:
             state = control.getCurState()
             pos = control.getPos()
             
+            print(state)
+
             # Checks if user has pressed the stop button
             if guiControl.isStopPressed:
-                control.kill()
+                control.reset()
                 guiOutput.setResetting(True)
 
             if state == MOVING_DOWN_STATE or state == MOVING_UP_STATE:
@@ -132,6 +137,7 @@ try:
                     control.setCalibrated(c.getCalibrationState())
 
                 control.setCalibrated(c.getCalibrationState())
+                c.resetCalibrationData()
             
             elif state == FAULTED_STATE:
                 # Tells GUI that system is resetting
