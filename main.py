@@ -86,7 +86,7 @@ try:
             pos = control.getPos()
             
             # Checks if user has pressed the stop button
-            if guiControl.isStopPressed():
+            if guiControl.isStopPressed:
                 control.kill()
                 guiOutput.setResetting(True)
 
@@ -119,13 +119,14 @@ try:
                 isCalibrated = False
                 c = Calibration()
                 while not c.getCalibrationState():
-                    data = hw.read_R(pot)
-                    pos = control.getPos()
 
+                    data = hw.read_R(pot)
+                    pos = control.getPos()                    
+  
                     t = time.time() - startTime
                     guiOutput.update(t, pos, data)
 
-                    # print("CALIBRATING WITH: ", data)
+                    #print("CALIBRATING WITH: ", data)
                     c.insertCalibrationData(data)
                     control.setCalibrated(c.getCalibrationState())
 
@@ -144,6 +145,7 @@ try:
 
             elif state == TEST_COMPLETE_STATE:
                 # Controller completes test, gui displays message
+                control.reset()
                 guiOutput.addMessage("Test Complete!")
                 break
 

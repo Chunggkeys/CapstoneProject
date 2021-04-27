@@ -9,6 +9,9 @@ POS_THRESHOLD = 0.001
 class Controller:
     def __init__(self, motor):
         self.motor = motor
+        self.reset()
+
+    def reset(self):
 
         self.idleState = 0
         self.homingState = 1
@@ -28,7 +31,6 @@ class Controller:
         self.status=0
         self.state=0
     
-
         self.curTime = 0
 
         self.errorBuffer = []

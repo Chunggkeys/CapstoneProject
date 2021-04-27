@@ -34,7 +34,7 @@ class ResistanceSet:
                 self.__var = ( (__n - 2) * self.__var  + (__val - self.__mean ) * (__val - self.__prev_mean) ) / (__n - 1)
                 self.__std = sqrt(self.__var)
 
-            if (__n > 2 and (__val - self.__mean) / self.__std > 2):
+            if (__n > 2 and self.__std > 1e-16 and (__val - self.__mean) / self.__std > 2):
                 self.__count += 1
             else:
                 self.__count = 0
