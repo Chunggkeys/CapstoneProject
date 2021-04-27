@@ -17,10 +17,9 @@ class Common:
         key_temp = "Temperature"
         key_stime = "Sample Time"
         key_mpos = "Motor Position"
-        
+
 class Data:
     def __init__(self):
-        self.testName = "TempName"
         # Timestamp
         self.Time = []
         # Resistances
@@ -43,6 +42,8 @@ class Data:
         self.pw   = '2018'
         self.host = 'localhost'
 
+    # Function used each sample time
+    # Dictionary passed to prevent misordering data
     def appendData(self, **kwargs):
         for key, val in kwargs.items():
             if val == None:
@@ -88,6 +89,25 @@ class Data:
                  )
         return output
 
+    # function to clear data after saved to database
+    def _clearData(self):
+        # Timestamp
+        self.Time = []
+        # Resistances
+        self.R0 = []
+        self.R1 = []
+        self.R2 = []
+        self.R3 = []
+        # Voltages
+        self.V0 = []
+        self.V1 = []
+        self.V2 = []
+        self.V3 = []
+        # Various other values
+        self.Temp = []
+        self.SampleTime = []
+        self.MotorPosition = []
+
     # used for mysql upload and safety in case crash during upload
     def saveToCSV(self):
         data_tuple = self._getDataTuple()
@@ -104,7 +124,8 @@ class Data:
                 
                 fw.write(temp_line[:-1]+"\n")
 
-    # work in progress function - *Needs more testing*
+    # Function to upload data to database
+    # Label is same as previous label system used in database interactions
     def uploadToDatabase(self, label):
         self.saveToCSV()
         con = DBConnector(user=self.user, password=self.pw, host=self.host)
@@ -129,4 +150,5 @@ class Data:
         con.add_data("test_data",  "test_data.csv", samples=sampleIds, data_type = 'static', date_created=date)
         #print("Added data")
         con.disconnect()
+        self._clearData()
 
