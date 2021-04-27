@@ -141,7 +141,7 @@ class Controller:
             # sleep(0 if t < 0 else t)
 
         self._running = False
-        
+
         return
 
     def setParams(self, totalCycles, displacement):
@@ -160,6 +160,9 @@ class Controller:
 
     def setCalibrated(self, isCalibrated):
         self.isCalibrated = isCalibrated
+    
+    def beginTest(self):
+        self._running = True
 
     def kill(self):
         self.motor.stop()
