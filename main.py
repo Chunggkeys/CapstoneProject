@@ -28,7 +28,6 @@ totalCycles = 0; displacement = 0
 pot = []
 totalDisplacement = 0
 
-# measurementData = Queue()
 motor = mechSysInit(PORT, False)
 guiOutput, guiControl = guiInit(False)
 db, dbKeys = dbInit(devMode)
@@ -50,10 +49,12 @@ try:
         while 1:
 
             # Loop executes until user input is submitted
+            guiOutput.setResetting(False)
             inputData = guiControl.getDataBuffer()
             if inputData is not None:
                 totalCycles = inputData['n']
                 displacement = inputData['d']
+                label = inputData['label']
                 pot = [inputData['p1'], inputData['p2'], inputData['p3'], inputData['p4']]
                 print(pot)
                 time.sleep(5)
@@ -83,9 +84,13 @@ try:
         while 1:
             state = control.getCurState()
             pos = control.getPos()
+            
+            # Checks if user has pressed the stop button
+            if guiControl.isStopPressed():
+                control.kill()
+                guiOutput.setResetting(True)
 
             if state == MOVING_DOWN_STATE or state == MOVING_UP_STATE:
-                # print("MOVING UP OR DOWN: ", data, temp)
                 # As actuator is moving up and down, resistance data and temperature
                 # are being read and stored into hash
                 data = hw.read_R(pot)
@@ -125,6 +130,12 @@ try:
                     control.setCalibrated(c.getCalibrationState())
 
                 control.setCalibrated(c.getCalibrationState())
+            
+            elif state == FAULTED_STATE:
+                # Tells GUI that system is resetting
+                guiOutput.setResetting(True)
+                guiControl.setStopPressed(False)
+
             elif state == FAILED_STATE:
                 # Controller errors obtained and gui displays error message
                 controllerErrors = control.getErrorBuffer()
@@ -139,7 +150,7 @@ try:
         hw.close()
 
         # Data uploaded to database here
-        db.uploadToDatabase("sample,label,here")
+        db.uploadToDatabase(label)
 
         # Flags reset for the next test
         startPressed = False; inputData = None
