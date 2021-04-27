@@ -61,79 +61,81 @@ class Controller:
         self.curState = self.homingState
         self.curCycle = 1
 
-        while self._running:
+        while 1:
 
-            self.curTime = milliseconds()  
-        
-            print(self)
+            if self._running:
 
-            self.status = self.motor.get_status()[1]            
-            self.pos = self.motor.get_position_mm()
+                self.curTime = milliseconds()  
             
-            # print("Position: " + str(self.pos))
-            # print("Status: " + str(self.status))
-            # print("Cycle: " + str(self.curCycle))
+                print(self)
 
-            if self.status == '0' or self.status == '10' or self.status == '11':
-                self.errorBuffer.append("Controller error code: " + self.status + "\n")
-                self.curState = self.faultedState
+                self.status = self.motor.get_status()[1]            
+                self.pos = self.motor.get_position_mm()
                 
+                # print("Position: " + str(self.pos))
+                # print("Status: " + str(self.status))
+                # print("Cycle: " + str(self.curCycle))
 
-            if self.curState == self.calibratingState:
-                # print("CALIBRATING STATE")
-                self.motor.move_absolute_mm(FULL_DISPLACEMENT, waitStop=False)
+                if self.status == '0' or self.status == '10' or self.status == '11':
+                    self.errorBuffer.append("Controller error code: " + self.status + "\n")
+                    self.curState = self.faultedState
+                    
+
+                if self.curState == self.calibratingState:
+                    # print("CALIBRATING STATE")
+                    self.motor.move_absolute_mm(FULL_DISPLACEMENT, waitStop=False)
+                    
+                    if self.isCalibrated:
+                        # Actuator stops as soon as calibration is calibrated. 
+                        # Motion parameters are saved and logged
+                        self.motor.stop()
+                        self.calibrationValue = self.motor.get_position_mm()
+                        self.totalDisplacement = self.calibrationValue + self.displacement
+
+                        # Log parameterized values
+                        # print("Calibrated displacement: " + self.calibrationValue + "\nTotal displacement: " + self.totalDisplacement + "\n\n")
+                        self.curState += 1
                 
-                if self.isCalibrated:
-                    # Actuator stops as soon as calibration is calibrated. 
-                    # Motion parameters are saved and logged
-                    self.motor.stop()
-                    self.calibrationValue = self.motor.get_position_mm()
-                    self.totalDisplacement = self.calibrationValue + self.displacement
+                if self.curState == self.homingState:
+                    # print("HOMING STATE")
+                    self.motor.move_absolute_mm(self.minPos, waitStop=False)
 
-                    # Log parameterized values
-                    # print("Calibrated displacement: " + self.calibrationValue + "\nTotal displacement: " + self.totalDisplacement + "\n\n")
-                    self.curState += 1
+                    if self.pos <= self.minPos + POS_THRESHOLD:
+                        self.curState = self.calibratingState
             
-            if self.curState == self.homingState:
-                # print("HOMING STATE")
-                self.motor.move_absolute_mm(self.minPos, waitStop=False)
+                elif self.curState == self.movingDownState:
+                    # print("MOVING DOWN")
+                    self.motor.move_absolute_mm(self.totalDisplacement, waitStop=False)
 
-                if self.pos <= self.minPos + POS_THRESHOLD:
-                    self.curState = self.calibratingState
+                    if self.pos >= self.totalDisplacement-POS_THRESHOLD:
+                        self.motor.stop()
+                        self.curState += 1
+
+                elif self.curState == self.movingUpState:
+                    # print("MOVING UP")
+                    self.motor.move_absolute_mm(self.calibrationValue, waitStop=False)
+
+                    if self.pos <= self.calibrationValue + POS_THRESHOLD:   
+                        self.motor.stop()
+                        if self.curCycle == self.totalCycles:
+                            self.curState = self.testCompleteState
+                        else:
+                            self.curState -= 1; self.curCycle += 1
         
-            elif self.curState == self.movingDownState:
-                # print("MOVING DOWN")
-                self.motor.move_absolute_mm(self.totalDisplacement, waitStop=False)
-
-                if self.pos >= self.totalDisplacement-POS_THRESHOLD:
-                    self.motor.stop()
-                    self.curState += 1
-
-            elif self.curState == self.movingUpState:
-                # print("MOVING UP")
-                self.motor.move_absolute_mm(self.calibrationValue, waitStop=False)
-
-                if self.pos <= self.calibrationValue + POS_THRESHOLD:   
-                    self.motor.stop()
-                    if self.curCycle == self.totalCycles:
-                        self.curState = self.testCompleteState
-                    else:
-                        self.curState -= 1; self.curCycle += 1
-    
-            elif self.curState == self.faultedState:
-                #  Retry current cycle
+                elif self.curState == self.faultedState:
+                    #  Retry current cycle
+                    
+                    self.motor.home(waitStop=False)
+                    
+                    if self.status == '32' or self.status == '33':
+                        self.errorBuffer.append("Controller error code: " + self.status + "\nWARNING: Motor has not been reset\n")
+                        self.curState = self.calibratingState
                 
-                self.motor.home(waitStop=False)
-                
-                if self.status == '32' or self.status == '33':
-                    self.errorBuffer.append("Controller error code: " + self.status + "\nWARNING: Motor has not been reset\n")
-                    self.curState = self.calibratingState
+                elif self.curState == self.failedState:
+                    break
             
-            elif self.curState == self.failedState:
-                break
-        
-            elif self.curState == self.testCompleteState:
-                break
+                elif self.curState == self.testCompleteState:
+                    break
 
 
             # t = ( 300 - (milliseconds() - self.curTime )) / 1000
