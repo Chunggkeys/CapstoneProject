@@ -107,7 +107,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.eventTimer.start(50)
 
         #if motor is resetting
-        self.loading = self.output.isResetting()
+        self.resetting = self.output.isResetting()
     
     # when enter key is pressed
     def keyPressEvent(self, event):
@@ -128,9 +128,9 @@ class MainWindow(QtWidgets.QMainWindow):
             if error:
                 self.displayMessage(error, 'error')
 
-        if self.loading != self.output.isResetting():
-            self.loading = self.output.isResetting()
-            self.toggleLoadingDialog()
+        if self.resetting != self.output.isResetting():
+            self.resetting = self.output.isResetting()
+            self.toggleReset()
         
     def update(self):
         error = self.output.readErrors()
@@ -157,6 +157,22 @@ class MainWindow(QtWidgets.QMainWindow):
         self.input_ptt2.clear()
         self.input_ptt3.clear()
         self.input_ptt4.clear()
+
+    # reset buttons, inputs, and graphs
+    def reset(self):
+        self.timer.stop()
+        self.btn_start.setText('Start')
+        self.input_sLabel.setReadOnly(False)
+        self.input_length.setReadOnly(False)
+        self.input_thick.setReadOnly(False)
+        self.input_def.setReadOnly(False)
+        self.input_nCycles.setReadOnly(False)
+        self.input_ptt1.setReadOnly(False)
+        self.input_ptt2.setReadOnly(False)
+        self.input_ptt3.setReadOnly(False)
+        self.input_ptt4.setReadOnly(False)
+        self.btn_clear.setEnabled(True)
+        self.btn_start.setChecked(False)
 
     # convert inputs to numbers and check if any inputs are empty
     def parseInputs(self):
@@ -186,7 +202,6 @@ class MainWindow(QtWidgets.QMainWindow):
                 'p3': float(p3), 
                 'p4': float(p4)
             }
-
 
     def toggleStart(self):
         # if operation has started
@@ -221,6 +236,8 @@ class MainWindow(QtWidgets.QMainWindow):
                     pickle.dump(params, f)
                     f.close()
 
+                    self.curvePos.setData([])
+                    self.curveResist.setData([])
                     self.control.setDataBuffer(params)
 
                     self.timer.start(50)
@@ -267,14 +284,14 @@ class MainWindow(QtWidgets.QMainWindow):
     def resGraphChanged(self, i):
         self.selected_res = i
 
-    def toggleLoadingDialog(self):
-        if self.loading:
+    def toggleReset(self):
+        if self.resetting:
             self.btn_start.setEnabled(False)
             self.btn_start.setText('Resetting...')
         else:
             self.btn_start.setEnabled(True)
             self.btn_start.setText('Start')
-
+            self.reset()
 
 def initGUI(control, output):
     app = QtWidgets.QApplication(sys.argv)
