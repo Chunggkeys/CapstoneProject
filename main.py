@@ -146,7 +146,7 @@ try:
             elif state == TEST_COMPLETE_STATE:
                 # Controller completes test, gui displays message
                 guiOutput.addMessage("Test Complete!")
-                controller.reset()
+                control.reset()
                 break
 
         hw.close()
