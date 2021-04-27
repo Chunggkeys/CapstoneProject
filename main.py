@@ -67,7 +67,6 @@ try:
         control.setParams(totalCycles, displacement)
 
         # pot = [680,680,680,680]
-        # control.setParams(3,5)
 
 
         # Initialize SPI communication to allow temperature and resistance
