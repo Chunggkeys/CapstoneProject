@@ -50,7 +50,7 @@ try:
         # Start controller on another thread
         t = threading.Thread(target=control.run, args=())
         t.start()
-        
+
         while 1:
 
             # Loop executes until user input is submitted
@@ -147,10 +147,10 @@ try:
             elif state == TEST_COMPLETE_STATE:
                 # Controller completes test, gui displays message
                 guiOutput.addMessage("Test Complete!")
-                controller.reset()
+                control.reset()
                 break
 
-        hw.close(); control.reset()
+        hw.close()
 
         # Data uploaded to database here
         db.uploadToDatabase(label)
