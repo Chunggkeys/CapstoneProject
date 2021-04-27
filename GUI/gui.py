@@ -174,9 +174,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self.btn_clear.setEnabled(True)
         self.btn_start.setChecked(False)
 
-        self.curvePos.setData([])
-        self.curveResist.setData([])
-
     # convert inputs to numbers and check if any inputs are empty
     def parseInputs(self):
         label = self.input_sLabel.text()
@@ -239,6 +236,8 @@ class MainWindow(QtWidgets.QMainWindow):
                     pickle.dump(params, f)
                     f.close()
 
+                    self.curvePos.setData([])
+                    self.curveResist.setData([])
                     self.control.setDataBuffer(params)
 
                     self.timer.start(50)
