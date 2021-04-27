@@ -3,6 +3,7 @@
 
 import spidev
 import time
+import threading
 import sys
 import RPi.GPIO as GPIO
 from array import *
@@ -186,6 +187,8 @@ class HW:
 
 
     def Read_Data(self,x):
+        dio_lock = threading.Lock()    # mutex variable that threads will attempt to grab 
+
         volt = 0;
         buff = [0,0,0,0,0,0,0,0,0];
         #buff=array('b',[0,0,0,0,0,0,0,0,0])
@@ -196,7 +199,9 @@ class HW:
         GPIO.output(CS_PIN[x], False)
         #time.sleep(0.001)               # sleep for 0.1 seconds
         #for i in range(0,9):
-        buff = self.spi.xfer2([0xff,0xff,0xff])
+
+        with dio_lock:
+            buff = self.spi.xfer2([0xff,0xff,0xff])
         '''buff2 = spi.xfer2([0xff])
         buff3 = spi.xfer2([0xff])'''
         #buff[i] = buffer[0]
