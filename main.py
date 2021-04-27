@@ -48,6 +48,13 @@ try:
     t = threading.Thread(target=control.run, args=())
     t.start()
 
+
+
+    # Initialize SPI communication to allow temperature and resistance
+    # measurement
+    hw.initialisation1()
+    hw.initialisation2()
+
     while 1:
         print("Awaiting test start")
 
@@ -78,11 +85,6 @@ try:
 
         # pot = [680,680,680,680]
 
-
-        # Initialize SPI communication to allow temperature and resistance
-        # measurement
-        hw.initialisation1()
-        hw.initialisation2()
 
         isCalibrated = False
         c = Calibration()
