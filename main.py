@@ -63,7 +63,7 @@ try:
         while 1:
 
             # Loop executes until user input is submitted
-            guiOutput.setResetting(False)
+            #guiOutput.setResetting(False)
             inputData = guiControl.getDataBuffer()
             if inputData is not None:
                 totalCycles = inputData['n']
@@ -97,7 +97,7 @@ try:
             state = control.getCurState()
             pos = control.getPos()
             
-            print(state)
+            #print(state)
 
             # Checks if user has pressed the stop button
             if guiControl.isStopPressed:
@@ -161,7 +161,7 @@ try:
             elif state == TEST_COMPLETE_STATE:
                 # Controller completes test, gui displays message
                 guiOutput.addMessage("Test Complete!")
-                guiOutput.setResetting(False)
+                guiOutput.setResetting(True)
                 break
 
         hw.close()

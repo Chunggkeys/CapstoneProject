@@ -160,6 +160,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
     # reset buttons, inputs, and graphs
     def reset(self):
+        print("RESET")
         self.timer.stop()
         self.btn_start.setText('Start')
         self.input_sLabel.setReadOnly(False)

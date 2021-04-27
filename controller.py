@@ -1,6 +1,6 @@
 from time import time, sleep
 
-FULL_DISPLACEMENT = 25
+FULL_DISPLACEMENT = 14
 
 milliseconds = lambda : int(time()*1000)
 
