@@ -105,6 +105,9 @@ class MainWindow(QtWidgets.QMainWindow):
         self.eventTimer = pg.QtCore.QTimer()
         self.eventTimer.timeout.connect(self.checkEvents)
         self.eventTimer.start(50)
+
+        #if motor is resetting
+        self.loading = self.output.isResetting()
     
     # when enter key is pressed
     def keyPressEvent(self, event):
@@ -125,6 +128,10 @@ class MainWindow(QtWidgets.QMainWindow):
             if error:
                 self.displayMessage(error, 'error')
 
+        if self.loading != self.output.isResetting():
+            self.loading = self.output.isResetting()
+            self.toggleLoadingDialog()
+        
     def update(self):
         error = self.output.readErrors()
         if error:
@@ -259,6 +266,15 @@ class MainWindow(QtWidgets.QMainWindow):
     # change the displayed resistance
     def resGraphChanged(self, i):
         self.selected_res = i
+
+    def toggleLoadingDialog(self):
+        if self.loading:
+            self.btn_start.setEnabled(False)
+            self.btn_start.setText('Resetting...')
+        else:
+            self.btn_start.setEnabled(True)
+            self.btn_start.setText('Start')
+
 
 def initGUI(control, output):
     app = QtWidgets.QApplication(sys.argv)
