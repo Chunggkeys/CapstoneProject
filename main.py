@@ -46,6 +46,11 @@ try:
 
     while 1:
         print("Awaiting test start")
+
+        # Start controller on another thread
+        t = threading.Thread(target=control.run, args=())
+        t.start()
+        
         while 1:
 
             # Loop executes until user input is submitted
@@ -74,10 +79,6 @@ try:
         # measurement
         hw.initialisation1()
         hw.initialisation2()
-
-        # Start controller on another thread
-        t = threading.Thread(target=control.run, args=())
-        t.start()
 
         startTime = time.time()
 
@@ -149,7 +150,7 @@ try:
                 guiOutput.addMessage("Test Complete!")
                 break
 
-        hw.close()
+        hw.close(); control.reset()
 
         # Data uploaded to database here
         db.uploadToDatabase(label)

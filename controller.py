@@ -38,6 +38,9 @@ class Controller:
 
         self.minPos = 6
 
+        self._running = False
+        self._initialized = True
+
     def stateAsString(self) -> str:
         if self.curState == self.idleState: return "IDLE" 
         elif self.curState == self.homingState: return "HOMING"
@@ -58,7 +61,7 @@ class Controller:
         self.curState = self.homingState
         self.curCycle = 1
 
-        while 1:
+        while self._running:
 
             self.curTime = milliseconds()  
         
@@ -137,6 +140,8 @@ class Controller:
             # print("Sleep: " + str(milliseconds()-self.curTime))
             # sleep(0 if t < 0 else t)
 
+        self._running = False
+        
         return
 
     def setParams(self, totalCycles, displacement):
