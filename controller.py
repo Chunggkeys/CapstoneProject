@@ -25,12 +25,29 @@ class Controller:
         self.zeros = [0,0,0,0]
         self.curState = self.idleState
 
+        self.status=0
+        self.state=0
+    
+
         self.curTime = 0
 
         self.errorBuffer = []
         self.pos = self.motor.get_position_mm()
 
-        self.minPos = 13
+        self.minPos = 6
+
+    def stateAsString(self) -> str:
+        if self.curState == self.idleState: return "IDLE" 
+        elif self.curState == self.homingState: return "HOMING"
+        elif self.curState == self.calibratingState: return "CALIBRATING"
+        elif self.curState == self.movingDownState: return "MOVING_DOWN"
+        elif self.curState == self.movingUpState: return "MOVING_UP"
+        elif self.curState == self.faultedState: return "FAULTED"
+        elif self.curState == self.testCompleteState: return "COMPLETE"
+        elif self.curState == self.failedState: return "FAILED"
+        
+    def __str__(self):
+        return "State: " + self.stateAsString() + "  Pos: " + str(self.pos) + "  Status: " + str(self.status) 
 
     def getPos(self):
         return self.pos
@@ -43,6 +60,7 @@ class Controller:
 
             self.curTime = milliseconds()  
         
+            print(self)
 
             self.status = self.motor.get_status()[1]            
             self.pos = self.motor.get_position_mm()
@@ -60,18 +78,16 @@ class Controller:
                 # print("CALIBRATING STATE")
                 self.motor.move_absolute_mm(FULL_DISPLACEMENT, waitStop=False)
                 
-                while not self.isCalibrated:
-                    pass
+                if self.isCalibrated:
+                    # Actuator stops as soon as calibration is calibrated. 
+                    # Motion parameters are saved and logged
+                    self.motor.stop()
+                    self.calibrationValue = self.motor.get_position_mm()
+                    self.totalDisplacement = self.calibrationValue + self.displacement
 
-                # Actuator stops as soon as calibration is calibrated. 
-                # Motion parameters are saved and logged
-                self.motor.stop()
-                self.calibrationValue = self.motor.get_position_mm()
-                self.totalDisplacement = self.calibrationValue + self.displacement
-
-                # Log parameterized values
-                # print("Calibrated displacement: " + self.calibrationValue + "\nTotal displacement: " + self.totalDisplacement + "\n\n")
-                self.curState += 1
+                    # Log parameterized values
+                    # print("Calibrated displacement: " + self.calibrationValue + "\nTotal displacement: " + self.totalDisplacement + "\n\n")
+                    self.curState += 1
             
             if self.curState == self.homingState:
                 # print("HOMING STATE")
@@ -115,9 +131,9 @@ class Controller:
                 break
 
 
-            t = ( 300 - (milliseconds() - self.curTime )) / 1000
+            # t = ( 300 - (milliseconds() - self.curTime )) / 1000
             # print("Sleep: " + str(milliseconds()-self.curTime))
-            sleep(0 if t < 0 else t)
+            # sleep(0 if t < 0 else t)
 
         return
 
@@ -137,3 +153,7 @@ class Controller:
 
     def setCalibrated(self, isCalibrated):
         self.isCalibrated = isCalibrated
+
+    def kill(self):
+        self.motor.stop()
+        self.motor.move_absolute_mm(self.minPos)

@@ -32,6 +32,7 @@ class MainWindow(QtWidgets.QMainWindow):
         super(MainWindow, self).__init__(*args, **kwargs)
 
         #Load the UI Page
+        # uic.loadUi('./GUI/mainwindow.ui', self)
         uic.loadUi('./GUI/mainwindow.ui', self)
 
         #ui title and positioning
@@ -66,10 +67,12 @@ class MainWindow(QtWidgets.QMainWindow):
         #Initialize graph widgets
         self.graph_pos.setLabel('bottom', 'Time', 's')
         self.graph_pos.setLabel('left', 'Motor Position', 'mm')
-        self.graph_pos.setYRange(0, 1, padding=0.1)
 
         self.graph_resist.setLabel('bottom', 'Time', 's')
         self.graph_resist.setLabel('left', 'Resistance', '\u03A9')
+
+        self.graph_pos.setMouseEnabled(x=False, y=False)
+        self.graph_resist.setMouseEnabled(x=False, y=False)
 
         self.curvePos = self.graph_pos.plot()
         self.curveResist = self.graph_resist.plot()
@@ -163,7 +166,7 @@ class MainWindow(QtWidgets.QMainWindow):
         # if operation has started
         if not self.btn_start.isChecked():
             if self.confirmQuestion('Are you sure you want to stop operation?'):
-                self.control.setStopPressed(False)
+                self.control.setStopPressed(True)
                 self.timer.stop()
                 self.btn_start.setText('Start')
 
@@ -187,7 +190,6 @@ class MainWindow(QtWidgets.QMainWindow):
 
                 if not invalid:
                     self.control.setDataBuffer(params)
-                    self.graph_pos.setYRange(0, params['d'], padding=0.1)
 
                     self.timer.start(50)
                     self.btn_start.setText('Stop')

@@ -127,6 +127,6 @@ class Data:
             sampleIds.append(con.get_by_label(label.upper() if len(label) <= 2 else label, 'samples', verbose = False))   
 
         con.add_data("test_data",  "test_data.csv", samples=sampleIds, data_type = 'static', date_created=date)
-        print("Added data")
+        #print("Added data")
         con.disconnect()
 
