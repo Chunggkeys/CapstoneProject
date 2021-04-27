@@ -128,9 +128,9 @@ class MainWindow(QtWidgets.QMainWindow):
             if error:
                 self.displayMessage(error, 'error')
 
-        if self.resetting != self.output.isResetting():
-            self.resetting = self.output.isResetting()
-            self.toggleReset()
+        if self.output.isResetting():
+            self.reset()
+            self.output.setResetting(False)
         
     def update(self):
         error = self.output.readErrors()
@@ -173,6 +173,9 @@ class MainWindow(QtWidgets.QMainWindow):
         self.input_ptt4.setReadOnly(False)
         self.btn_clear.setEnabled(True)
         self.btn_start.setChecked(False)
+
+        self.curvePos.setData([])
+        self.curveResist.setData([])
 
     # convert inputs to numbers and check if any inputs are empty
     def parseInputs(self):
@@ -236,8 +239,6 @@ class MainWindow(QtWidgets.QMainWindow):
                     pickle.dump(params, f)
                     f.close()
 
-                    self.curvePos.setData([])
-                    self.curveResist.setData([])
                     self.control.setDataBuffer(params)
 
                     self.timer.start(50)
@@ -283,15 +284,6 @@ class MainWindow(QtWidgets.QMainWindow):
     # change the displayed resistance
     def resGraphChanged(self, i):
         self.selected_res = i
-
-    def toggleReset(self):
-        if self.resetting:
-            self.btn_start.setEnabled(False)
-            self.btn_start.setText('Resetting...')
-        else:
-            self.btn_start.setEnabled(True)
-            self.btn_start.setText('Start')
-            self.reset()
 
 def initGUI(control, output):
     app = QtWidgets.QApplication(sys.argv)
