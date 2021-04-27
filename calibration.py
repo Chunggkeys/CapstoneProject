@@ -78,8 +78,8 @@ class Calibration:
         # Removes the oldest data once capacity of buffer has reached CALIBRATION_MAX_LENGTH
         for d, r in zip(data, self.allResistors):
             r.add(d)
-        print(r)
-
+            print(r)
+    
     def resetCalibrationData(self):
 
 

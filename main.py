@@ -72,6 +72,7 @@ try:
         
         # totalDisplacement = displacement + calibrationDisplacement
 
+        control.reset()
         control.setParams(totalCycles, displacement)
         control.beginTest()
 
@@ -83,6 +84,11 @@ try:
         hw.initialisation1()
         hw.initialisation2()
 
+        isCalibrated = False
+        c = Calibration()
+
+        guiOutput.reset()
+
         startTime = time.time()
 
         while 1:
@@ -93,7 +99,7 @@ try:
 
             # Checks if user has pressed the stop button
             if guiControl.isStopPressed:
-                control.reset()
+                #control.reset()
                 guiOutput.setResetting(True)
 
             if state == MOVING_DOWN_STATE or state == MOVING_UP_STATE:
@@ -122,9 +128,8 @@ try:
 
             elif state == CALIBRATING_STATE:
                 # Calibration using statistical analysis, t-test
-                isCalibrated = False
-                c = Calibration()
-                while not c.getCalibrationState():
+
+                if not c.getCalibrationState():
 
                     data = hw.read_R(pot)
                     pos = control.getPos()                    
@@ -132,12 +137,13 @@ try:
                     t = time.time() - startTime
                     guiOutput.update(t, pos, data)
 
-                    #print("CALIBRATING WITH: ", data)
+                    print("CALIBRATING WITH: ", data)
                     c.insertCalibrationData(data)
                     control.setCalibrated(c.getCalibrationState())
 
-                control.setCalibrated(c.getCalibrationState())
-                c.resetCalibrationData()
+                else:
+                    control.setCalibrated(c.getCalibrationState())
+                    c.resetCalibrationData()
             
             elif state == FAULTED_STATE:
                 # Tells GUI that system is resetting
@@ -153,7 +159,7 @@ try:
             elif state == TEST_COMPLETE_STATE:
                 # Controller completes test, gui displays message
                 guiOutput.addMessage("Test Complete!")
-                control.reset()
+                guiOutput.setResetting(False)
                 break
 
         hw.close()
