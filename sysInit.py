@@ -16,19 +16,19 @@ from measurementModule import HW
 class SampleGUIControl:
     def __init__(self):
         self.msg = "this is a sample gui control"
-        print("Initializing gui control")
+        #print("Initializing gui control")
     
     def msg(self):
         return self.msg
 
     def waitStart(self):
         time.sleep(1)
-        print("start button pressed")
+        #print("start button pressed")
         return True
     
     def getDataBuffer(self):
         time.sleep(1)
-        print("Grabbed data from display")
+        #print("Grabbed data from display")
         self.data = { 
             'l' : 10,
             't' : 2,
@@ -47,56 +47,57 @@ class SampleGUIControl:
 class SampleGUI:
     def __init__(self):
         self.msg = "This is a sample gui"
-        print("Initialiizng gui..")
+        #print("Initialiizng gui..")
 
 class SampleGUIOutput:
     def __init__(self):
         self.msg = "this is a sample gui output"
-        print("Initializing gui output...")
+        #print("Initializing gui output...")
 
     def msg(self):
         return self.msg
        
     def sendData(self, data):
-        print("sending data to output")
+        #print("sending data to output")
         return
         
     def displayError(self, errorCode, msg):
-        print("Error sent to display with code: ",errorCode)
+        #print("Error sent to display with code: ",errorCode)
+        return
 
     def displayTestComplete(self):
-        print("Test completed")
-        
+        #print("Test completed")
+        return
     def addMessage(self, msg):
-        print(msg)
-        
+        #print(msg)
+        return
     def update(self, t, pos, data):
-        print(str(t) + ", " + str(pos) + ", " + str(data) + "\n")
-
+        #print(str(t) + ", " + str(pos) + ", " + str(data) + "\n")
+        return
 
 class SampleDB:
     def __init__(self):
         self.msg = "this is a sample db"
-        print("Initializing connection to database...")
+        #print("Initializing connection to database...")
     
     def msg(self):
         return self.msg
 
     def sendData(self, data):
         self.data = data
-        print("data sent")
+        #print("data sent")
         return
 
     def appendData(self, **kwargs):
-        print("adding to buffer")
+        ##print("adding to buffer")
         return
     
     def uploadToDatabase(self, label):
-        print("Uploading to database")
+        ##print("Uploading to database")
         return
     
     def appendData(self, **kwargs):
-        print("adding data to buffer")
+        ##print("adding data to buffer")
         return
 
 class SampleDBKeys:
@@ -116,7 +117,7 @@ class SampleDBKeys:
 class SampleHW:
     def __init__(self):
         self.msg = "this is a sample piece of hw"
-        print("Initializing hardware...")
+        #print("Initializing hardware...")
 
     def msg(self):
         return self.msg
@@ -128,46 +129,47 @@ class SampleHW:
         return 20
 
     def initialisation1(self):
-        print("Initializing hw via init1")
+        #print("Initializing hw via init1")
         return
 
     def initialisation2(self):
-        print("Initializing hw via init2")
+        #print("Initializing hw via init2")
         return
 
 class SampleMotor:
     def __init__(self):
         self.msg = "this is a sample motor"
         self.status = [['0'],['1']]
-        print("Initializing motor...")
+        #print("Initializing motor...")
 
     def msg(self):
         return self.msg
 
     def home(self):
-        print("Homing motor")
+        #print("Homing motor")
         return 0
     
     def stop(self):
-        print("Stopped motor")
-        
+        #print("Stopped motor")
+        return
     def move_relative_mm(self, dist_mm, waitStop=True):
         time.sleep(1)
-        print("Moving stage to ", dist_mm)
+        #print("Moving stage to ", dist_mm)
     
     def get_position_mm(self):
         return 4
     
     def move_absolute_mm(self, absolute_dist_mm, waitStop=True):
-        print("Moving stage to ", absolute_dist_mm)
-    
+        #print("Moving stage to ", absolute_dist_mm)
+        return
+
     def get_status(self):
         return self.status
 ##
 
 def mechSysInit(port, devMode=False):
     if not devMode:
-        motor = SMC100(1, port, silent=False)
+        motor = SMC100(1, port, silent=True)
         # motor.home()
     else:
         motor = SampleMotor()

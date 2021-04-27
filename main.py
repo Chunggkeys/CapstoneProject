@@ -28,7 +28,6 @@ totalCycles = 0; displacement = 0
 pot = []
 totalDisplacement = 0
 
-# measurementData = Queue()
 motor = mechSysInit(PORT, False)
 guiOutput, guiControl = guiInit(False)
 db, dbKeys = dbInit(devMode)
@@ -43,93 +42,124 @@ dbData = {}
 # All print statements will now print to this log
 # sys.stdout = open('params.log', 'w')
 
-while 1:
-    print("Awaiting test start")
-    while 1:
-
-        # Loop executes until user input is submitted
-        inputData = guiControl.getDataBuffer()
-        if inputData is not None:
-            totalCycles = inputData['n']
-            displacement = inputData['d']
-            pot = [inputData['p1'], inputData['p2'], inputData['p3'], inputData['p4']]
-            print(pot)
-            time.sleep(5)
-
-            guiControl.clearDataBuffer()
-            curState = CALIBRATING_STATE
-            break
-    
-    # totalDisplacement = displacement + calibrationDisplacement
-    control.setParams(totalCycles, displacement)
-
-    # Initialize SPI communication to allow temperature and resistance
-    # measurement
-    hw.initialisation1()
-    hw.initialisation2()
-
-    # Start controller on another thread
-    t = threading.Thread(target=control.run, args=())
-    t.start()
+try: 
 
     while 1:
-        state = control.getCurState()
-        pos = control.getPos()
+        print("Awaiting test start")
+        while 1:
 
-        if state == MOVING_DOWN_STATE or state == MOVING_UP_STATE:
-            # print("MOVING UP OR DOWN: ", data, temp)
-            # As actuator is moving up and down, resistance data and temperature
-            # are being read and stored into hash
-            data = hw.read_R(pot)
-            temp = hw.read_T()
+            # Loop executes until user input is submitted
+            guiOutput.setResetting(False)
+            inputData = guiControl.getDataBuffer()
+            if inputData is not None:
+                totalCycles = inputData['n']
+                displacement = inputData['d']
+                label = inputData['label']
+                pot = [inputData['p1'], inputData['p2'], inputData['p3'], inputData['p4']]
+                print(pot)
+                time.sleep(5)
 
-            t = time.time()
+                guiControl.clearDataBuffer()
+                curState = CALIBRATING_STATE
+                break
+        
+        # totalDisplacement = displacement + calibrationDisplacement
 
-            dbData[dbKeys.key_time] = t
-            dbData[dbKeys.key_mpos] = pos
-            dbData[dbKeys.key_res0] = data[0]
-            dbData[dbKeys.key_res1] = data[1]
-            dbData[dbKeys.key_res2] = data[2]
-            dbData[dbKeys.key_res3] = data[3]
+        control.setParams(totalCycles, displacement)
+
+        # pot = [680,680,680,680]
+
+
+        # Initialize SPI communication to allow temperature and resistance
+        # measurement
+        hw.initialisation1()
+        hw.initialisation2()
+
+        # Start controller on another thread
+        t = threading.Thread(target=control.run, args=())
+        t.start()
+
+        startTime = time.time()
+
+        while 1:
+            state = control.getCurState()
+            pos = control.getPos()
             
-            db.appendData(**dbData)
+            # Checks if user has pressed the stop button
+            if guiControl.isStopPressed:
+                control.kill()
+                guiOutput.setResetting(True)
 
-            # Update live graph
-            guiOutput.update(t, pos, data)
-
-        elif state == HOMING_STATE:
-            print("HOMING STATE")
-
-        elif state == CALIBRATING_STATE:
-            # Calibration using statistical analysis, t-test
-            isCalibrated = False
-            c = Calibration()
-            while not c.getCalibrationState():
+            if state == MOVING_DOWN_STATE or state == MOVING_UP_STATE:
+                # As actuator is moving up and down, resistance data and temperature
+                # are being read and stored into hash
                 data = hw.read_R(pot)
-                # print("CALIBRATING WITH: ", data)
-                c.insertCalibrationData(data)
+                temp = hw.read_T()
+
+                t = time.time() - startTime
+
+                dbData[dbKeys.key_time] = t
+                dbData[dbKeys.key_mpos] = pos
+                dbData[dbKeys.key_res0] = data[0]
+                dbData[dbKeys.key_res1] = data[1]
+                dbData[dbKeys.key_res2] = data[2]
+                dbData[dbKeys.key_res3] = data[3]
+                
+                db.appendData(**dbData)
+
+                # Update live graph
+                guiOutput.update(t, pos, data)
+
+            elif state == HOMING_STATE:
+                #print("HOMING STATE")
+                pass
+
+            elif state == CALIBRATING_STATE:
+                # Calibration using statistical analysis, t-test
+                isCalibrated = False
+                c = Calibration()
+                while not c.getCalibrationState():
+
+                    data = hw.read_R(pot)
+                    pos = control.getPos()                    
+  
+                    t = time.time() - startTime
+                    guiOutput.update(t, pos, data)
+
+                    #print("CALIBRATING WITH: ", data)
+                    c.insertCalibrationData(data)
+                    control.setCalibrated(c.getCalibrationState())
+
                 control.setCalibrated(c.getCalibrationState())
+            
+            elif state == FAULTED_STATE:
+                # Tells GUI that system is resetting
+                guiOutput.setResetting(True)
+                guiControl.setStopPressed(False)
 
-        elif state == FAILED_STATE:
-            # Controller errors obtained and gui displays error message
-            controllerErrors = control.getErrorBuffer()
-            guiOutput.addError("Test has failed")
-            break
+            elif state == FAILED_STATE:
+                # Controller errors obtained and gui displays error message
+                controllerErrors = control.getErrorBuffer()
+                guiOutput.addError("Test has failed")
+                break
 
-        elif state == TEST_COMPLETE_STATE:
-            # Controller completes test, gui displays message
-            guiOutput.addMessage("Test Complete!")
-            break
+            elif state == TEST_COMPLETE_STATE:
+                # Controller completes test, gui displays message
+                control.reset()
+                guiOutput.addMessage("Test Complete!")
+                break
 
-    hw.close()
+        hw.close()
 
-    # Data uploaded to database here
-    db.uploadToDatabase("sample,label,here")
+        # Data uploaded to database here
+        db.uploadToDatabase(label)
 
-    # Flags reset for the next test
-    startPressed = False; inputData = None
-    curState = IDLE_STATE; curCycle = 1
+        # Flags reset for the next test
+        startPressed = False; inputData = None
+        curState = IDLE_STATE; curCycle = 1
 
-
+except:
+    control.kill()
+    raise
 
 

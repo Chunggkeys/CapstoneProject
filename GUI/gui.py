@@ -2,6 +2,8 @@ from PyQt5 import QtWidgets, uic, QtGui
 from pyqtgraph import PlotWidget
 import pyqtgraph as pg
 import sys
+from os import path
+import pickle
 from .constants import *
 
 paramMappings = {
@@ -45,10 +47,25 @@ class MainWindow(QtWidgets.QMainWindow):
         #Initialize button behaviour
         self.btn_clear.clicked.connect(self.clearInputs)
         self.btn_start.clicked.connect(self.toggleStart)
+        self.input_sLabel.setFocus()
 
         #Initialize resistance select dropdown
         self.select_resist.currentIndexChanged.connect(self.resGraphChanged)
         self.selected_res = 0
+
+        #look for any stored inputs
+        if path.exists('inputs.pckl'):
+            f = open('inputs.pckl', 'rb')
+            params = pickle.load(f)
+            self.input_sLabel.setText(params['label'])
+            self.input_length.setText(str(params['l']))
+            self.input_thick.setText(str(params['t']))
+            self.input_def.setText(str(params['d']))
+            self.input_nCycles.setText(str(params['n']))
+            self.input_ptt1.setText(str(params['p1']))
+            self.input_ptt2.setText(str(params['p2']))
+            self.input_ptt3.setText(str(params['p3']))
+            self.input_ptt4.setText(str(params['p4']))
 
         #set input validators
         intValidator = QtGui.QIntValidator()
@@ -66,10 +83,12 @@ class MainWindow(QtWidgets.QMainWindow):
         #Initialize graph widgets
         self.graph_pos.setLabel('bottom', 'Time', 's')
         self.graph_pos.setLabel('left', 'Motor Position', 'mm')
-        self.graph_pos.setYRange(0, 1, padding=0.1)
 
         self.graph_resist.setLabel('bottom', 'Time', 's')
         self.graph_resist.setLabel('left', 'Resistance', '\u03A9')
+
+        self.graph_pos.setMouseEnabled(x=False, y=False)
+        self.graph_resist.setMouseEnabled(x=False, y=False)
 
         self.curvePos = self.graph_pos.plot()
         self.curveResist = self.graph_resist.plot()
@@ -86,6 +105,9 @@ class MainWindow(QtWidgets.QMainWindow):
         self.eventTimer = pg.QtCore.QTimer()
         self.eventTimer.timeout.connect(self.checkEvents)
         self.eventTimer.start(50)
+
+        #if motor is resetting
+        self.loading = self.output.isResetting()
     
     # when enter key is pressed
     def keyPressEvent(self, event):
@@ -106,6 +128,10 @@ class MainWindow(QtWidgets.QMainWindow):
             if error:
                 self.displayMessage(error, 'error')
 
+        if self.loading != self.output.isResetting():
+            self.loading = self.output.isResetting()
+            self.toggleLoadingDialog()
+        
     def update(self):
         error = self.output.readErrors()
         if error:
@@ -122,6 +148,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 self.curveResist.setData(x, dataResist[self.selected_res])
         
     def clearInputs(self):
+        self.input_sLabel.clear()
         self.input_length.clear()
         self.input_thick.clear()
         self.input_def.clear()
@@ -133,6 +160,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
     # convert inputs to numbers and check if any inputs are empty
     def parseInputs(self):
+        label = self.input_sLabel.text()
         l = self.input_length.text()
         t = self.input_thick.text()
         d = self.input_def.text()
@@ -142,12 +170,13 @@ class MainWindow(QtWidgets.QMainWindow):
         p3 = self.input_ptt3.text()
         p4 = self.input_ptt4.text()
 
-        if (not l or not t or not d or not n or not
+        if (not label or not l or not t or not d or not n or not
             p1 or not p2 or not p3 or not p4):
             self.displayMessage('Cannot leave field empty', 'warning')
             return {}
         else:
             return {
+                'label': label,
                 'l': float(l), 
                 't': float(t), 
                 'd': float(d), 
@@ -163,10 +192,11 @@ class MainWindow(QtWidgets.QMainWindow):
         # if operation has started
         if not self.btn_start.isChecked():
             if self.confirmQuestion('Are you sure you want to stop operation?'):
-                self.control.setStopPressed(False)
+                self.control.setStopPressed(True)
                 self.timer.stop()
                 self.btn_start.setText('Start')
 
+                self.input_sLabel.setReadOnly(False)
                 self.input_length.setReadOnly(False)
                 self.input_thick.setReadOnly(False)
                 self.input_def.setReadOnly(False)
@@ -186,12 +216,17 @@ class MainWindow(QtWidgets.QMainWindow):
                 invalid = self.control.validateParams(params)
 
                 if not invalid:
+                    #store inputs
+                    f = open('inputs.pckl', 'wb')
+                    pickle.dump(params, f)
+                    f.close()
+
                     self.control.setDataBuffer(params)
-                    self.graph_pos.setYRange(0, params['d'], padding=0.1)
 
                     self.timer.start(50)
                     self.btn_start.setText('Stop')
 
+                    self.input_sLabel.setReadOnly(True)
                     self.input_length.setReadOnly(True)
                     self.input_thick.setReadOnly(True)
                     self.input_def.setReadOnly(True)
@@ -231,6 +266,15 @@ class MainWindow(QtWidgets.QMainWindow):
     # change the displayed resistance
     def resGraphChanged(self, i):
         self.selected_res = i
+
+    def toggleLoadingDialog(self):
+        if self.loading:
+            self.btn_start.setEnabled(False)
+            self.btn_start.setText('Resetting...')
+        else:
+            self.btn_start.setEnabled(True)
+            self.btn_start.setText('Start')
+
 
 def initGUI(control, output):
     app = QtWidgets.QApplication(sys.argv)

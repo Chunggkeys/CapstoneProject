@@ -15,6 +15,8 @@ class Output():
         self.errorBuffer = []
         self.messageBuffer = []
 
+        self.resetting = False
+
         self.initializeData()
     
     def initializeData(self):
@@ -29,7 +31,7 @@ class Output():
         self.dataResist3 = np.empty(DATA_BUFF_SIZE)
 
     def reset(self):
-        self.ptr = 1
+        self.ptr = 0
         self.initializeData()
     
     def update(self, x, motorPos, resistance):
@@ -42,7 +44,7 @@ class Output():
             self.dataResist3[self.ptr] = resistance[3]
 
             self.x[self.ptr] = x
-
+            #print(x, motorPos, resistance)
             self.ptr +=1 
 
         # if the amount of data has reached the data buffer size, start removing earliest data
@@ -86,3 +88,9 @@ class Output():
         if self.messageBuffer:
             return self.messageBuffer.pop(0)
         return None
+
+    def isResetting(self):
+        return self.resetting
+    
+    def setResetting(self, value):
+        self.resetting = value
