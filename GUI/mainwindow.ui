@@ -18,9 +18,9 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>20</y>
+      <y>70</y>
       <width>311</width>
-      <height>171</height>
+      <height>151</height>
      </rect>
     </property>
     <property name="title">
@@ -32,7 +32,7 @@
        <x>10</x>
        <y>40</y>
        <width>131</width>
-       <height>41</height>
+       <height>31</height>
       </rect>
      </property>
     </widget>
@@ -42,7 +42,7 @@
        <x>170</x>
        <y>40</y>
        <width>131</width>
-       <height>41</height>
+       <height>31</height>
       </rect>
      </property>
     </widget>
@@ -76,7 +76,7 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>100</y>
+       <y>90</y>
        <width>131</width>
        <height>16</height>
       </rect>
@@ -89,9 +89,9 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>120</y>
+       <y>110</y>
        <width>131</width>
-       <height>41</height>
+       <height>31</height>
       </rect>
      </property>
     </widget>
@@ -99,7 +99,7 @@
      <property name="geometry">
       <rect>
        <x>170</x>
-       <y>100</y>
+       <y>90</y>
        <width>131</width>
        <height>16</height>
       </rect>
@@ -112,9 +112,9 @@
      <property name="geometry">
       <rect>
        <x>170</x>
-       <y>120</y>
+       <y>110</y>
        <width>131</width>
-       <height>41</height>
+       <height>31</height>
       </rect>
      </property>
     </widget>
@@ -123,9 +123,9 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>200</y>
+      <y>230</y>
       <width>311</width>
-      <height>171</height>
+      <height>151</height>
      </rect>
     </property>
     <property name="title">
@@ -137,7 +137,7 @@
        <x>10</x>
        <y>40</y>
        <width>131</width>
-       <height>41</height>
+       <height>31</height>
       </rect>
      </property>
     </widget>
@@ -147,7 +147,7 @@
        <x>170</x>
        <y>40</y>
        <width>131</width>
-       <height>41</height>
+       <height>31</height>
       </rect>
      </property>
     </widget>
@@ -155,9 +155,9 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>120</y>
+       <y>110</y>
        <width>131</width>
-       <height>41</height>
+       <height>31</height>
       </rect>
      </property>
     </widget>
@@ -165,9 +165,9 @@
      <property name="geometry">
       <rect>
        <x>170</x>
-       <y>120</y>
+       <y>110</y>
        <width>131</width>
-       <height>41</height>
+       <height>31</height>
       </rect>
      </property>
     </widget>
@@ -201,7 +201,7 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>100</y>
+       <y>90</y>
        <width>131</width>
        <height>16</height>
       </rect>
@@ -214,7 +214,7 @@
      <property name="geometry">
       <rect>
        <x>170</x>
-       <y>100</y>
+       <y>90</y>
        <width>131</width>
        <height>16</height>
       </rect>
@@ -306,6 +306,37 @@
      </item>
     </widget>
    </widget>
+   <widget class="QLineEdit" name="input_sLabel">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>30</y>
+      <width>311</width>
+      <height>31</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_sLabel">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>10</y>
+      <width>121</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Sample Label</string>
+    </property>
+   </widget>
+   <zorder>SPgroupBox</zorder>
+   <zorder>PTTgroupBox</zorder>
+   <zorder>btn_start</zorder>
+   <zorder>btn_clear</zorder>
+   <zorder>graph_pos</zorder>
+   <zorder>graph_resist</zorder>
+   <zorder>label_sLabel</zorder>
+   <zorder>input_sLabel</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
@@ -327,6 +358,20 @@
    <container>1</container>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>input_sLabel</tabstop>
+  <tabstop>input_length</tabstop>
+  <tabstop>input_thick</tabstop>
+  <tabstop>input_def</tabstop>
+  <tabstop>input_nCycles</tabstop>
+  <tabstop>input_ptt1</tabstop>
+  <tabstop>input_ptt2</tabstop>
+  <tabstop>input_ptt3</tabstop>
+  <tabstop>input_ptt4</tabstop>
+  <tabstop>btn_start</tabstop>
+  <tabstop>btn_clear</tabstop>
+  <tabstop>select_resist</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

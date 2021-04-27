@@ -15,6 +15,8 @@ class Output():
         self.errorBuffer = []
         self.messageBuffer = []
 
+        self.resetting = False
+
         self.initializeData()
     
     def initializeData(self):
@@ -86,3 +88,9 @@ class Output():
         if self.messageBuffer:
             return self.messageBuffer.pop(0)
         return None
+
+    def isResetting(self):
+        return self.resetting
+    
+    def setResetting(self, value):
+        self.resetting = value
