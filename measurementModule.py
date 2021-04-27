@@ -54,6 +54,9 @@ class HW:
             GPIO.setup(CS_PIN[x],GPIO.OUT)
             GPIO.setup(DRDY_PIN[x],GPIO.IN)
 
+        self.init1Completed = False
+        self.init2Completed = False
+
     def Reg_Write(self,address,data):    # write Fibonacci series up to 
         for x in range(NUM_PINS):
             print ("Writing %s to Register %s" %( hex(data),hex(address)))
@@ -113,40 +116,47 @@ class HW:
 
 
     def initialisation1(self):  
-        print ("INITIALISATION");
 
-        self.Spi_command(START);
-        time.sleep(0.1);
-        self.Spi_command(STOP);
-        time.sleep(0.1);
-        self.Spi_command(SDATAC);
-        time.sleep(0.3);
+        if not self.init1Completed:
+            print ("INITIALISATION");
 
-        self.Reg_Write(0x00, 0x01);
-        time.sleep(0.01); 
-        self.Reg_Write(0x01, 0x04);
-        time.sleep(0.01); 
-        self.Reg_Write(0x02, 0b11010000);
-        time.sleep(0.01);
-        self.Reg_Write(0x03, 0x00);
-        time.sleep(0.01);
+            self.Spi_command(START);
+            time.sleep(0.1);
+            self.Spi_command(STOP);
+            time.sleep(0.1);
+            self.Spi_command(SDATAC);
+            time.sleep(0.3);
 
-        self.Reg_read(0x00);
-        time.sleep(0.1);
-        self.Reg_read(0x04);
-        time.sleep(0.1);
-        self.Reg_read(0x08);
-        time.sleep(0.1);
-        self.Reg_read(0x0c);
+            self.Reg_Write(0x00, 0x01);
+            time.sleep(0.01); 
+            self.Reg_Write(0x01, 0x04);
+            time.sleep(0.01); 
+            self.Reg_Write(0x02, 0b11010000);
+            time.sleep(0.01);
+            self.Reg_Write(0x03, 0x00);
+            time.sleep(0.01);
 
-        self.Spi_command(RDATAC);
-        time.sleep(0.3); 
+            self.Reg_read(0x00);
+            time.sleep(0.1);
+            self.Reg_read(0x04);
+            time.sleep(0.1);
+            self.Reg_read(0x08);
+            time.sleep(0.1);
+            self.Reg_read(0x0c);
 
-        self.Spi_command(START);
-        time.sleep(0.1);
+            self.Spi_command(RDATAC);
+            time.sleep(0.3); 
+
+            self.Spi_command(START);
+            time.sleep(0.1);
+            
+            for x in range(NUM_PINS):
+                GPIO.output(CS_PIN[x], True)
         
-        for x in range(NUM_PINS):
-            GPIO.output(CS_PIN[x], True)
+            self.init1Completed = True
+        else:
+            pass
+
         return;
 
     def toHex(dec):
@@ -159,12 +169,19 @@ class HW:
 
     def initialisation2(self):
 
-        time.sleep(0.2)
-        print ("STARTED")
+        if not self.init2Completed:
+            time.sleep(0.2)
+            print ("STARTED")
 
-        #GPIO.output(CS_PIN, False)
-        resp = self.spi.xfer2([0x11])        # transfer one byte
-        time.sleep(0.3)	
+            #GPIO.output(CS_PIN, False)
+            resp = self.spi.xfer2([0x11])        # transfer one byte
+            time.sleep(0.3)	
+
+            self.init2Completed = True
+        
+        else:
+            pass
+
         return;
 
 
