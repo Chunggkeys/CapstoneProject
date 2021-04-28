@@ -311,7 +311,7 @@
      <rect>
       <x>10</x>
       <y>30</y>
-      <width>311</width>
+      <width>141</width>
       <height>31</height>
      </rect>
     </property>
@@ -329,6 +329,29 @@
      <string>Sample Label</string>
     </property>
    </widget>
+   <widget class="QLineEdit" name="input_tLabel">
+    <property name="geometry">
+     <rect>
+      <x>180</x>
+      <y>30</y>
+      <width>141</width>
+      <height>31</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_tLabel">
+    <property name="geometry">
+     <rect>
+      <x>180</x>
+      <y>10</y>
+      <width>121</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Test Label</string>
+    </property>
+   </widget>
    <zorder>SPgroupBox</zorder>
    <zorder>PTTgroupBox</zorder>
    <zorder>btn_start</zorder>
@@ -337,6 +360,8 @@
    <zorder>graph_resist</zorder>
    <zorder>label_sLabel</zorder>
    <zorder>input_sLabel</zorder>
+   <zorder>input_tLabel</zorder>
+   <zorder>label_tLabel</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
@@ -360,6 +385,7 @@
  </customwidgets>
  <tabstops>
   <tabstop>input_sLabel</tabstop>
+  <tabstop>input_tLabel</tabstop>
   <tabstop>input_length</tabstop>
   <tabstop>input_thick</tabstop>
   <tabstop>input_def</tabstop>

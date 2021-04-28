@@ -68,7 +68,8 @@ try:
             if inputData is not None:
                 totalCycles = inputData['n']
                 displacement = inputData['d']
-                label = inputData['label']
+                sampleLabel = inputData['sample_label']
+                testLabel = inputData['test_label']
                 pot = [inputData['p1'], inputData['p2'], inputData['p3'], inputData['p4']]
                 print(pot)
                 time.sleep(5)
@@ -169,9 +170,7 @@ try:
         #hw.close()
 
         # Data uploaded to database here
-
-        print("UPLOADING")
-        db.uploadToDatabase(label)
+        db.uploadToDatabase(testLabel, sampleLabel)
 
         # Flags reset for the next test
         startPressed = False; inputData = None
