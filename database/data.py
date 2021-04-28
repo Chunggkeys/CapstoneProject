@@ -17,7 +17,7 @@ class Common:
         key_temp = "Temperature"
         key_stime = "Sample Time"
         key_mpos = "Motor Position"
-
+        
 class Data:
     def __init__(self):
         # Timestamp
@@ -42,8 +42,6 @@ class Data:
         self.pw   = '2018'
         self.host = 'localhost'
 
-    # Function used each sample time
-    # Dictionary passed to prevent misordering data
     def appendData(self, **kwargs):
         for key, val in kwargs.items():
             if val == None:
@@ -89,7 +87,6 @@ class Data:
                  )
         return output
 
-    # function to clear data after saved to database
     def _clearData(self):
         # Timestamp
         self.Time = []
@@ -125,8 +122,7 @@ class Data:
                 fw.write(temp_line[:-1]+"\n")
 
     # Function to upload data to database
-    # Label is same as previous label system used in database interactions
-    def uploadToDatabase(self, label):
+    def uploadToDatabase(self, testLabel, label):
         self.saveToCSV()
         con = DBConnector(user=self.user, password=self.pw, host=self.host)
 
@@ -147,8 +143,8 @@ class Data:
         else:
             sampleIds.append(con.get_by_label(label.upper() if len(label) <= 2 else label, 'samples', verbose = False))   
 
-        con.add_data("test_data",  "test_data.csv", samples=sampleIds, data_type = 'static', date_created=date)
-        #print("Added data")
+        con.add_data(testLabel,  datapath="test_data.csv", samples=sampleIds, data_type='bending', date_created=date)
+        print("Added data")
         con.disconnect()
         self._clearData()
 
