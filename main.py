@@ -128,6 +128,9 @@ try:
 
                 dbData[dbKeys.key_time] = t
                 dbData[dbKeys.key_mpos] = pos
+                dbData[dbKeys.key_temp0] = temp
+                # dbData[dbKeys.key_temp0] = temp[0]
+                # dbData[dbKeys.key_temp1] = temp[1]
                 dbData[dbKeys.key_res0] = data[0]
                 dbData[dbKeys.key_res1] = data[1]
                 dbData[dbKeys.key_res2] = data[2]
