@@ -105,9 +105,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self.eventTimer = pg.QtCore.QTimer()
         self.eventTimer.timeout.connect(self.checkEvents)
         self.eventTimer.start(50)
-
-        #if motor is resetting
-        self.resetting = self.output.isResetting()
     
     # when enter key is pressed
     def keyPressEvent(self, event):
@@ -128,9 +125,9 @@ class MainWindow(QtWidgets.QMainWindow):
             if error:
                 self.displayMessage(error, 'error')
 
-        if self.output.isResetting():
+        if self.output.isTestComplete():
             self.reset()
-            self.output.setResetting(False)
+            self.output.setTestComplete(False)
         
     def update(self):
         error = self.output.readErrors()
