@@ -8,7 +8,7 @@ from GUI.control import *
 from GUI.output import *
 from GUI.gui import initGUI
 # from ioInterface import *
-# from database.data import Data, Common
+from database.data import Data, Common
 from measurementModule import HW
 ########
 

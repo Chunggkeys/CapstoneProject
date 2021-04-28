@@ -2,6 +2,8 @@ from datetime import datetime
 from .mesomatdbtools.dbconnector import DBConnector
 from dataclasses import dataclass
 import numpy as np
+     
+
 
 @dataclass
 class Common:
@@ -40,7 +42,7 @@ class Data:
         # User Info For DataBase
         self.user = 'alexander.dingwall@mesomat.com'
         self.pw   = '2018'
-        self.host = 'localhost'
+        self.host = '192.168.2.16'
 
     # Function used each sample time
     # Dictionary passed to prevent misordering data
@@ -126,7 +128,12 @@ class Data:
 
     # Function to upload data to database
     # Label is same as previous label system used in database interactions
-    def uploadToDatabase(self, label):
+    def uploadToDatabase(self, label, datapath="test_data.csv"):
+
+
+        print("UPLOADING")
+        
+
         self.saveToCSV()
         con = DBConnector(user=self.user, password=self.pw, host=self.host)
 
@@ -147,8 +154,10 @@ class Data:
         else:
             sampleIds.append(con.get_by_label(label.upper() if len(label) <= 2 else label, 'samples', verbose = False))   
 
-        con.add_data("test_data",  "test_data.csv", samples=sampleIds, data_type = 'static', date_created=date)
-        #print("Added data")
+        con.add_data("test_data",  "test_data.csv", datapath=datapath, samples=sampleIds, data_type = 'bending', date_created=date)
+        
+        print("Added data")
+        
         con.disconnect()
         self._clearData()
 

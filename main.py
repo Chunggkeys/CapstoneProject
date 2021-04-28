@@ -12,7 +12,7 @@ PORT = "/dev/ttyUSB0"
 
 # Developer mode, flip this flag to false to run with real components
 # Flip to false to use placeholder classes. 
-devMode = True
+devMode = False
 
 IDLE_STATE                  = 0
 HOMING_STATE                = 1
@@ -101,8 +101,8 @@ try:
 
             # Checks if user has pressed the stop button
             if guiControl.isStopPressed:
-                #control.reset()
-                guiOutput.setResetting(True)
+                control.stop()
+                guiOutput.setTestComplete(True)
 
             if state == MOVING_DOWN_STATE or state == MOVING_UP_STATE:
                 # As actuator is moving up and down, resistance data and temperature
@@ -161,12 +161,16 @@ try:
             elif state == TEST_COMPLETE_STATE:
                 # Controller completes test, gui displays message
                 guiOutput.addMessage("Test Complete!")
-                guiOutput.setResetting(True)
+                guiOutput.setTestComplete(True)
                 break
 
-        hw.close()
+
+
+        #hw.close()
 
         # Data uploaded to database here
+
+        print("UPLOADING")
         db.uploadToDatabase(label)
 
         # Flags reset for the next test

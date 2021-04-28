@@ -17,12 +17,29 @@ tables and return results in an easy to parse format.
 from .exceptions import AuthenticationError, TableNotFoundError, ColumnNotFoundError, InvalidParameterError, InvalidIdError
 
 import mysql.connector as mysql
-from mysql.connector import errorcode
+from mysql.connector import errorcode, conversion
 
 from datetime import date
 from os import path
 
 import pandas as pd
+
+
+class NumpyMySQLConverter(conversion.MySQLConverter):
+    """ A mysql.connector Converter that handles Numpy types """
+
+    def _float32_to_mysql(self, value):
+        return float(value)
+
+    def _float64_to_mysql(self, value):
+        return float(value)
+
+    def _int32_to_mysql(self, value):
+        return int(value)
+
+    def _int64_to_mysql(self, value):
+        return int(value)
+
 
 class DBConnector:
     
@@ -80,6 +97,7 @@ class DBConnector:
         try:
             
             self.cnx = mysql.connect(**self.config)
+            self.cnx.set_converter_class(NumpyMySQLConverter)
             self.cursor = self.cnx.cursor()
             
             self.cursor.execute("SET GLOBAL max_allowed_packet=100*1024*1024") # max allowed file size = 100 MB

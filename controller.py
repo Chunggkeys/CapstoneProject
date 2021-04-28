@@ -174,6 +174,10 @@ class Controller:
     def beginTest(self):
         self._running = True
 
+    def stop(self):
+        self.reset()
+        self.curState = self.testCompleteState
+
     def kill(self):
         self.motor.stop()
         self.motor.move_absolute_mm(self.minPos)
