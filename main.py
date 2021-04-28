@@ -135,6 +135,9 @@ try:
                 dbData[dbKeys.key_res1] = data[1]
                 dbData[dbKeys.key_res2] = data[2]
                 dbData[dbKeys.key_res3] = data[3]
+                dbData[dbKeys.key_temp0] = temp[0]
+                dbData[dbKeys.key_temp1] = temp[1]
+                
 
                 
                 db.appendData(**dbData)

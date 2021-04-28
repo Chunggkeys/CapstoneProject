@@ -11,8 +11,8 @@ class Common:
         key_res1 = "R1"
         key_res2 = "R2"
         key_res3 = "R3"
-        key_temp0 = "Temp 0"
-        key_temp1 = "Temp 1"
+        key_temp0 = "T0"
+        key_temp1 = "T1"
         key_stime = "Sample Time"
         key_mpos = "Motor Position"
         
