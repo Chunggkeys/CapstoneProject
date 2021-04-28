@@ -15,7 +15,7 @@ class Output():
         self.errorBuffer = []
         self.messageBuffer = []
 
-        self.resetting = False
+        self.testComplete = False
 
         self.initializeData()
     
@@ -89,8 +89,8 @@ class Output():
             return self.messageBuffer.pop(0)
         return None
 
-    def isResetting(self):
-        return self.resetting
+    def isTestComplete(self):
+        return self.testComplete
     
-    def setResetting(self, value):
-        self.resetting = value
+    def setTestComplete(self, value):
+        self.testComplete = value
