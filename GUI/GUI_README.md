@@ -12,7 +12,7 @@ The gui consists of 3 modules: the interface, control and output
 
 The layout and elements of the interface is created using QtDesigner which creates .ui file. This file is loaded when the main waindow is initialized which instantiates all the UI elements and their positions.
 
-The graphs are displayed using a graph widget from [pyqtgraph](https://pyqtgraph.readthedocs.io/en/latest/style.html). The logic of the scrolling graph is taken from one of their graph scrolling [examples](https://doc.qt.io/qtforpython/#documentation).
+The graphs are displayed using a graph widget from [pyqtgraph](https://pyqtgraph.readthedocs.io/en/latest/introduction.html). The logic of the scrolling graph is taken from one of their graph scrolling [examples](https://pyqtgraph.readthedocs.io/en/latest/introduction.html#examples).
 
 ## Control and Output
 
