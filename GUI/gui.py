@@ -28,6 +28,8 @@ maxParamMappings = {
     'p4': str(MAX_POT) + ' \u03A9'
 }
 
+exited = False
+
 class MainWindow(QtWidgets.QMainWindow):
     
     def __init__(self, control, output, *args, **kwargs):
@@ -293,4 +295,6 @@ def initGUI(control, output):
     app = QtWidgets.QApplication(sys.argv)
     main = MainWindow(control, output)
     main.show()
+    exited=True
     sys.exit(app.exec_())
+

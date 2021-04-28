@@ -20,6 +20,7 @@ class Controller:
         self.movingUpState = 4 
         self.faultedState = 5
         self.testCompleteState = 6
+        self.exitLoop = 7
         self.failedState = -1
 
         self.isCalibrated = False
@@ -136,13 +137,14 @@ class Controller:
                 
                 elif self.curState == self.failedState:
 
-                        self._running = False
+                    self._running = False
 
                 elif self.curState == self.testCompleteState:
 
-                        self._running = False
+                    self._running = False
                     
-
+                elif self.curState == self.exitLoop:
+                    break
 
             # t = ( 300 - (milliseconds() - self.curTime )) / 1000
             # print("Sleep: " + str(milliseconds()-self.curTime))
@@ -179,5 +181,6 @@ class Controller:
         self.curState = self.testCompleteState
 
     def kill(self):
+        self.curState = self.exitLoop
         self.motor.stop()
-        self.motor.move_absolute_mm(self.minPos)
+        self.motor.move_absolute_mm(self.minPos, waitStop = False)

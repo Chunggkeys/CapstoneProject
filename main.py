@@ -3,6 +3,7 @@ import time
 import sys
 
 from sysInit import *
+from GUI.gui import exited
 from controller import Controller
 from calibration import Calibration
 from manager import Manager
@@ -29,7 +30,7 @@ pot = []
 totalDisplacement = 0
 
 motor = mechSysInit(PORT, False)
-guiOutput, guiControl = guiInit(False)
+guiThread, guiOutput, guiControl = guiInit(False)
 db, dbKeys = dbInit(devMode)
 hw = hwInit(False)
 control = Controller(motor)
@@ -45,7 +46,7 @@ dbData = {}
 try:      
     
      # Start controller on another thread
-    t = threading.Thread(target=control.run, args=())
+    t = threading.Thread(target=control.run, args=(), daemon = True)
     t.start()
 
 
@@ -61,6 +62,12 @@ try:
   
 
         while 1:
+
+
+            if (not guiThread.is_alive()):
+                control.kill()
+                hw.close()
+                exit(0)
 
             # Loop executes until user input is submitted
             #guiOutput.setResetting(False)
@@ -97,6 +104,12 @@ try:
         while 1:
             state = control.getCurState()
             pos = control.getPos()
+
+            if (not guiThread.is_alive()):
+                control.kill()
+                hw.close()
+                exit(0)
+
             
             #print(state)
 

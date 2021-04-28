@@ -177,6 +177,7 @@ def mechSysInit(port, devMode=False):
     return motor
 
 def guiInit(devMode=False):
+    t=None
     # Display should startup here
     if devMode:
         guiOutput = SampleGUIOutput()
@@ -185,14 +186,14 @@ def guiInit(devMode=False):
     else:
         guiOutput = Output()
         guiControl = Control()
-        t = threading.Thread(target=initGUI, args=(guiControl,guiOutput,))
+        t = threading.Thread(target=initGUI, args=(guiControl,guiOutput,), daemon = True)
         t.start()
         # p = Process(target=initGUI, args=(guiControl,guiOutput,))
         # p.start()
         # p.join()
         # initGUI(guiControl, guiOutput)
         
-    return guiOutput, guiControl
+    return t,guiOutput, guiControl
 
 def dbInit(devMode=False):
     if devMode:
