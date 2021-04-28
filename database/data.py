@@ -2,7 +2,6 @@ from datetime import datetime
 from .mesomatdbtools.dbconnector import DBConnector
 from dataclasses import dataclass
 import numpy as np
-     
 
 
 @dataclass
@@ -12,11 +11,8 @@ class Common:
         key_res1 = "R1"
         key_res2 = "R2"
         key_res3 = "R3"
-        key_vol0 = "V0"
-        key_vol1 = "V1"
-        key_vol2 = "V2"
-        key_vol3 = "V3"
-        key_temp = "Temperature"
+        key_temp0 = "Temp 0"
+        key_temp1 = "Temp 1"
         key_stime = "Sample Time"
         key_mpos = "Motor Position"
         
@@ -29,13 +25,9 @@ class Data:
         self.R1 = []
         self.R2 = []
         self.R3 = []
-        # Voltages
-        self.V0 = []
-        self.V1 = []
-        self.V2 = []
-        self.V3 = []
         # Various other values
-        self.Temp = []
+        self.Temp0 = []
+        self.Temp1 = []
         self.SampleTime = []
         self.MotorPosition = []
 
@@ -58,16 +50,10 @@ class Data:
                 self.R2.append(val)
             elif key == Common.key_res3:
                 self.R3.append(val)
-            elif key == Common.key_vol0:
-                self.V0.append(val)
-            elif key == Common.key_vol1:
-                self.V1.append(val)
-            elif key == Common.key_vol2:
-                self.V2.append(val)
-            elif key == Common.key_vol3:
-                self.V3.append(val)
-            elif key == Common.key_temp:
-                self.Temp.append(val)
+            elif key == Common.key_temp0:
+                self.Temp0.append(val)
+            elif key == Common.key_temp1:
+                self.Temp1.append(val)
             elif key == Common.key_stime:
                 self.SampleTime.append(val)
             elif key == Common.key_mpos:
@@ -79,11 +65,8 @@ class Data:
                     [Common.key_res1] + self.R1,
                     [Common.key_res2] + self.R2,
                     [Common.key_res3] + self.R3,
-                    [Common.key_vol0] + self.V0,
-                    [Common.key_vol1] + self.V1,
-                    [Common.key_vol2] + self.V2,
-                    [Common.key_vol3] + self.V3,
-                    [Common.key_temp] + self.Temp,
+                    [Common.key_temp0] + self.Temp0,
+                    [Common.key_temp1] + self.Temp1,
                     [Common.key_stime] + self.SampleTime,
                     [Common.key_mpos] + self.MotorPosition
                  )
@@ -97,13 +80,9 @@ class Data:
         self.R1 = []
         self.R2 = []
         self.R3 = []
-        # Voltages
-        self.V0 = []
-        self.V1 = []
-        self.V2 = []
-        self.V3 = []
         # Various other values
-        self.Temp = []
+        self.Temp0 = []
+        self.Temp1 = []
         self.SampleTime = []
         self.MotorPosition = []
 
