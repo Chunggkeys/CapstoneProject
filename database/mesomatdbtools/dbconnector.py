@@ -301,8 +301,10 @@ class DBConnector:
             df = pd.read_csv(datapath)
             num_data_points = len(df)     
             if (len(df) > 0):
-                if ('time' in df or 'Time' in df):                
-                    duration = df['Time'].values[len(df)-1]
+                if ('time' in df):
+                    duration = df['time'].values[len(df)-1] - df['time'].values[0]                
+                elif ('Time' in df):                
+                    duration = df['Time'].values[len(df)-1] - df['Time'].values[0]
                 else:
                     duration = -1   
             
