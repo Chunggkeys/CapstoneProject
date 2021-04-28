@@ -59,8 +59,8 @@ class HW:
 
     def Reg_Write(self,address,data):    # write Fibonacci series up to 
         for x in range(NUM_PINS):
-            print ("Writing %s to Register %s" %( hex(data),hex(address)))
-            print(data);
+            #print ("Writing %s to Register %s" %( hex(data),hex(address)))
+            #print(data);
 
 
             opcode1 = (address<<2) | 0x40
@@ -78,9 +78,25 @@ class HW:
             GPIO.output(CS_PIN[x], True)
         return;
 
+    def Reg_Write_Pin(self, cs_pin, address, data):
+
+        opcode1 = (address<<2) | 0x40
+
+        GPIO.output(cs_pin, False)
+        time.sleep(0.002)               # sleep for 0.1 seconds
+        GPIO.output(cs_pin, True)
+        time.sleep(0.002)               # sleep for 0.1 seconds
+
+        GPIO.output(cs_pin, False)
+        time.sleep(0.002)               # sleep for 0.1 seconds
+        resp = self.spi.xfer2([opcode1])        # transfer one byte
+        resp = self.spi.xfer2([data])        # transfer one byte
+        time.sleep(0.002)               # sleep for 0.1 seconds
+        GPIO.output(cs_pin, True)
+
     def Reg_read(self,address):    # write Fibonacci series up to
         for x in range(NUM_PINS):
-            print ("Reading from Register %s" %(hex(address)))
+            #print ("Reading from Register %s" %(hex(address)))
             opcode1 = address | 0x20
 
             GPIO.output(CS_PIN[x], False)
@@ -95,8 +111,8 @@ class HW:
             time.sleep(0.002)               # sleep for 0.1 seconds
             GPIO.output(CS_PIN[x], True)
 
-            #print("Data read is %s" %(hex(resp)))
-            print(resp);
+            ##print("Data read is %s" %(hex(resp)))
+            #print(resp);
         return;
 
     def Spi_command(self, command):    # write Fibonacci series up to
@@ -118,7 +134,7 @@ class HW:
     def initialisation1(self):  
 
         if not self.init1Completed:
-            print ("INITIALISATION");
+            #print ("INITIALISATION");
 
             self.Spi_command(START);
             time.sleep(0.1);
@@ -171,7 +187,7 @@ class HW:
 
         if not self.init2Completed:
             time.sleep(0.2)
-            print ("STARTED")
+            ##print ("STARTED")
 
             #GPIO.output(CS_PIN, False)
             resp = self.spi.xfer2([0x11])        # transfer one byte
@@ -201,36 +217,49 @@ class HW:
         '''buff2 = spi.xfer2([0xff])
         buff3 = spi.xfer2([0xff])'''
         #buff[i] = buffer[0]
-        #print("%x" %buffer[0])	
+        ##print("%x" %buffer[0])	
         '''channel = 1
         r = spi.xfer2([1, (8+channel)<<4, 0])
         #r = spi.xfer2([0xff],[0xff],[0xff],[0xff],[0xff],[0xff],[0xff],[0xff],[0xff])
         r = spi.xfer2([0xff])
         #adcout = ((r[0]&3) << 8)
-        #print [(x) for x in buff]'''
+        ##print [(x) for x in buff]'''
 
         #time.sleep(0.002)               # sleep for 0.1 seconds
         GPIO.output(CS_PIN[x], True)
 
-    # print("0x %x %x %x\t"%(buff[0],buff[1],buff[2]))
+    # #print("0x %x %x %x\t"%(buff[0],buff[1],buff[2]))
         value = buff[0]<<16 | buff[1]<<8 | buff[2]
-    #   print(value)
+    #   #print(value)
         if ((float(value) >= 8388607)):
             volt = -1*((16777216-float(value)) * (3300.0)) / (8388607)
         else :
             volt = ((float(value) * (3300.0)) / 1 / (8388607))
-    #  print  (x, ":", volt,"mV")
+    #  #print  (x, ":", volt,"mV")
 
-        #print("0x %x %x %x\t"%(buff[0],buff[1],buff[2]))
-        '''print int(buff[0])
-        print int(buff[1])'''
+        ##print("0x %x %x %x\t"%(buff[0],buff[1],buff[2]))
+        '''#print int(buff[0])
+        #print int(buff[1])'''
 
-        '''print int(buff2[0])
-        print int(buff3[0])'''
+        '''#print int(buff2[0])
+        #print int(buff3[0])'''
 
 
         return volt;
         #return r
+
+    def select_mux_channels(self, cs_pin, channel):
+
+        if channel == 1:
+            code = 0x00
+        else:
+            code = 0x50
+
+        reg0 = 0x01
+        reg0 = reg0 & ~0xF0
+        reg0 = reg0 | code
+
+        self.Reg_Write_Pin(cs_pin, 0x00, reg0)
 
     def read_R(self, Pot):
         resistance = [0, 0, 0, 0]
@@ -245,13 +274,20 @@ class HW:
 
     def read_T(self):
         resistance = 0
-        voltage = self.Read_Data(4)
+        self.select_mux_channels(CS_PIN[4], 1)
+        v1 = self.Read_Data(4)
+        self.select_mux_channels(CS_PIN[4], 2)
+        v2 = self.Read_Data(4)
 
         temp_Calib = 28.82;
-        temp = voltage/0.041276 + temp_Calib 
+        t1 = v1/0.041276 + temp_Calib 
+        t2 = v2/0.041276 + temp_Calib 
+
+
+
         #resistance= (voltage * Pot)/(V_IN - voltage)
 
-        return temp
+        return (t1,t2)
 
     def close(self):
         self.spi.close()
@@ -267,5 +303,5 @@ class HW:
 
 #     x = hw.read_R([680,680,680,680]);
 #     t = hw.read_T()
-#     print(x, "mV", t, "C" )
+#     #print(x, "mV", t, "C" )
 

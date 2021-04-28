@@ -132,6 +132,7 @@ try:
                 dbData[dbKeys.key_res1] = data[1]
                 dbData[dbKeys.key_res2] = data[2]
                 dbData[dbKeys.key_res3] = data[3]
+
                 
                 db.appendData(**dbData)
 
