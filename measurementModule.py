@@ -25,20 +25,7 @@ NUM_PINS = 5
 V_IN = 3300
 DRDY_PIN  = [5,7,11,13,15]
 CS_PIN    = [29,31,33,35,37]
-
-# Is this necessary?
 voltage_array  = [0, 0, 0, 0, 0]
-
-
-#Set pin direction
-# for x in range(NUM_PINS):
-#     GPIO.setup(CS_PIN[x],GPIO.OUT)
-#     GPIO.setup(DRDY_PIN[x],GPIO.IN)
-
-# spi = spidev.SpiDev()# create spi object
-# spi.open(0,1)# open spi port 0, device (CS)1
-# spi.max_speed_hz = (500000)
-# spi.mode = (1)
 
 class HW:
     def __init__(self):
