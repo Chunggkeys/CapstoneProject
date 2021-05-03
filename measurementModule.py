@@ -1,6 +1,3 @@
-#import spiConfig
-
-
 import spidev
 import time
 import sys

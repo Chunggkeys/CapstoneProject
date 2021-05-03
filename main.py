@@ -29,10 +29,10 @@ totalCycles = 0; displacement = 0
 pot = []
 totalDisplacement = 0
 
-motor = mechSysInit(PORT, False)
-guiThread, guiOutput, guiControl = guiInit(False)
+motor = mechSysInit(PORT, devMode)
+guiThread, guiOutput, guiControl = guiInit(devMode)
 db, dbKeys = dbInit(devMode)
-hw = hwInit(False)
+hw = hwInit(devMode)
 control = Controller(motor)
 
 curState = IDLE_STATE
